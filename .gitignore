@@ -1,0 +1,6 @@
+node_modules
+coverage
+.env
+.nyc_output
+mocha.txt
+lab.txt
