@@ -4,3 +4,5 @@ coverage
 .nyc_output
 mocha.txt
 lab.txt
+privateKey.pem
+publicKey.pem

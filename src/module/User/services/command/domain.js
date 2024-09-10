@@ -1,8 +1,8 @@
 // const Query = require('../queries/query');
 import Command from './command.js';
 import * as wrapper from '../../../../helpers/utils/wrapper.js';
-import { generateOtp, sendEmail } from '../../../../helpers/utils/send_email.js';
-import { BadRequestError, ConflictError } from '../../../../helpers/error/index.js';
+// import { generateOtp, sendEmail } from '../../../../helpers/utils/send_email.js';
+import { ConflictError } from '../../../../helpers/error/index.js';
 import Query from '../queries/query.js';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
@@ -15,40 +15,42 @@ export default class User {
 
   async register(payload) {
     try {
-
       const emailExist = await this.query.emailExist(payload)
 
-      if (emailExist <= 1) {
-        wrapper.error(new ConflictError('email already exists'))
+      if (emailExist >= 1) {
+        console.log(emailExist)
+        return wrapper.error(new ConflictError('email already exists'))
       }
 
       const usernameExist = await this.query.usernameExist(payload)
 
-      if (usernameExist <= 1) {
-        wrapper.error(new ConflictError('username already exists'));
+      if (usernameExist >= 1) {
+        return wrapper.error(new ConflictError('username already exists'));
       }
 
-      const { otp,
-        //  expiredTime
-      } = await generateOtp()
+      // const { otp,
+      //   //  expiredTime
+      // } = await generateOtp()
 
-      const sendEmailStatus = await sendEmail(payload.email, otp);
+      // const sendEmailStatus = await sendEmail(payload.email, otp);
 
-      console.log(sendEmailStatus)
+      // console.log(sendEmailStatus)
 
-      if (!sendEmailStatus) {
-        wrapper.error(new BadRequestError('Registration failed, please try again'))
-      }
+      // if (!sendEmailStatus) {
+      //   wrapper.error(new BadRequestError('Registration failed, please try again'))
+      // }
 
-      const uuid = await crypto.randomUUID()
+      const uuid = crypto.randomUUID()
       const signature = nanoid(4)
-      const hashPassword = await bcrypt.hash(payload.password)
+      const hashPassword = bcrypt.hash(payload.password, 10)
+      
+      const result = await this.command.postRegister({ uuid, ...payload, hashPassword, signature })
 
-      const result = await this.command.postRegister({ uuid, payload, hashPassword, signature })
       return wrapper.data(result)
 
     } catch (err) {
-      wrapper.error(new BadRequestError(`${err.message}`));
+      // wrapper.error(new BadRequestError(`${err.message}`));
+      console.log(err);
     }
 
   }

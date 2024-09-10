@@ -11,12 +11,12 @@ import {
 } from '../error/index.js';
 // Assuming your error definitions reside in '../error'
 
-import * as httpError from '../http-status/status_code.js'; // Assuming your HTTP status code constants are in '../http-status/status_code'
+import { ERROR as httpError } from '../http-status/status_code.js'; // Assuming your HTTP status code constants are in '../http-status/status_code'
 
 const response = (res, type, result, message = '', code = 200) => {
   let status = true;
-  console.log(result)
   let data = result.data;
+
 
   if (type === 'fail') {
     status = false;
@@ -26,11 +26,10 @@ const response = (res, type, result, message = '', code = 200) => {
   }
 
   res.status(code).json({
-    success: status,
+    status: status,
     data,
     message,
     code,
-
   });
 };
 
@@ -47,7 +46,7 @@ const checkErrorCode = (error) => {
     case GatewayTimeoutError:
       return httpError.GATEWAY_TIMEOUT;
     case InternalServerError:
-      return httpError.INTERNAL_SERVER_ERROR;
+      return httpError.INTERNAL_ERROR;
     // Capitalized for consistency
     case NotFoundError:
       return httpError.NOT_FOUND;
