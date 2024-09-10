@@ -4,7 +4,7 @@ import {
   SUCCESS as http,
 } from '../../../helpers/http-status/status_code.js'
 import * as commandHandler from '../services/command/command_handler.js'
-import validator from '../../../helpers/utils/validator.js'
+import validator from '../utils/validator.js'
 import { registerModel } from '../models/user_model.js'
 
 
@@ -22,8 +22,7 @@ const userRegister = async (req, res) => {
   }
 
   const sendResponse = async (result) => {
-    console.log(result)
-    !result
+    result.err
       ? wrapper.response(
         res,
         'fail',
