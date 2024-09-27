@@ -7,4 +7,11 @@ const userRegister = async (payload) => {
   return postCommand(payload)
 }
 
-export { userRegister }
+const userLogin = async (payload) => {
+  const user = new User(sequelize);
+  const postCommand = async (payload) => await user.login(payload);
+  return postCommand(payload)
+
+}
+
+export { userRegister, userLogin }

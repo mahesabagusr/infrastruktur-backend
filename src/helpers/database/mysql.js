@@ -11,8 +11,8 @@ export const mysqlConnection = async () => {
 
         return sequelize
     } catch (e) {
-        // console.log(config.mysqlConfig)
-        console.log('Failed Connected to MySQL Database', e.message);
+
+        console.log('Failed Connected to MySQL Database', e);
     }
 
 

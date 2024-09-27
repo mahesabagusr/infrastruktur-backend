@@ -2,10 +2,11 @@
 import Command from './command.js';
 import * as wrapper from '../../../../helpers/utils/wrapper.js';
 // import { generateOtp, sendEmail } from '../../../../helpers/utils/send_email.js';
-import { ConflictError } from '../../../../helpers/error/index.js';
+import { BadRequestError, ConflictError, UnauthorizedError } from '../../../../helpers/error/index.js';
 import Query from '../queries/query.js';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
+import { createToken } from '../../../../middlewares/jwt_auth.js';
 
 export default class User {
   constructor(db) {
@@ -18,7 +19,6 @@ export default class User {
       const emailExist = await this.query.emailExist(payload)
 
       if (emailExist >= 1) {
-        console.log(emailExist)
         return wrapper.error(new ConflictError('email already exists'))
       }
 
@@ -42,17 +42,50 @@ export default class User {
 
       const uuid = crypto.randomUUID()
       const signature = nanoid(4)
-      const hashPassword = bcrypt.hash(payload.password, 10)
-      
+      const hashPassword = await bcrypt.hash(payload.password, 10)
+
+
       const result = await this.command.postRegister({ uuid, ...payload, hashPassword, signature })
 
       return wrapper.data(result)
 
     } catch (err) {
-      // wrapper.error(new BadRequestError(`${err.message}`));
-      console.log(err);
+      return wrapper.error(new BadRequestError(`${err.message}`));
     }
 
+  }
+
+  async login(payload) {
+    try {
+      // const checkEmail = await this.query.checkEmail(payload.email)
+      const data = await this.query.getUserByEmailOrUsername(payload.email || payload.username);
+
+      if (!data) {
+        return wrapper.error(new UnauthorizedError('wrong email or username, please enter a valid email or username'))
+      }
+
+      // const checkPassword = await this.query.checkPassword(payload.password)
+      const comparePassword = await bcrypt.compare(payload.password, data.password)
+
+      if (!comparePassword) {
+        return wrapper.error(new UnauthorizedError('wrong password, please enter a valid password'))
+      }
+      console.log(data)
+
+      const accessToken = await createToken(data)
+      const activity = 'Login'
+
+      const postActivity = await this.command.postActivity(activity, data.id)
+
+      if (!postActivity) {
+        return wrapper.error(new BadRequestError('could not insert an activity'))
+      }
+
+      return wrapper.data(accessToken)
+
+    } catch (err) {
+      return wrapper.error(new BadRequestError(`${err.message}`))
+    }
   }
 
   // async create(payload) {
