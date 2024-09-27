@@ -1,16 +1,17 @@
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
-import config  from '../infra/global_config.js'
+import { config } from '../infra/global_config.js'
+import * as wrapper from '../helpers/utils/wrapper.js'
+import Unauthorized from '../helpers/error/unauthorized_error.js';
 
 const getKey = keyPath => fs.readFileSync(keyPath, 'utf8');
+const privateKey = getKey(config.privateKey);
 
 export const createToken = (data) => {
-  const privateKey = getKey(config.get('/privateKey'));
-
   const accessToken = jwt.sign(
     { id: data.id, name: data.name, email: data.email, signature: data.signature },
     privateKey,
-    { expiresIn: '1d' }
+    { algorithm: 'RS256', expiresIn: '1d' }
   );
 
   return { accessToken };
@@ -20,8 +21,8 @@ export const createRefreshToken = (data) => {
 
   const refreshToken = jwt.sign(
     { id: data.id, name: data.name, email: data.email, signature: data.signature },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: '1d' }
+    privateKey,
+    { algorithm: 'RS256', expiresIn: '1d' }
   );
 
   return { refreshToken };
@@ -33,12 +34,12 @@ export const verifyToken = async (req, res, next) => {
     const token = authorization && authorization.split(' ')[1];
 
     if (token == null) {
-      return res.status(401);
+      return wrapper.error(new Unauthorized('Invalid token'))
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    jwt.verify(token, privateKey, (err, decoded) => {
       if (err) {
-        return res.sendStatus(403);
+        return wrapper.error(new Unauthorized('Invalid Token', err));
       }
 
       req.email = decoded.email;
@@ -46,10 +47,8 @@ export const verifyToken = async (req, res, next) => {
     })
 
   } catch (err) {
-    return res.status(500).json({
-      status: 'fail',
-      message: err.message
-    })
+    return wrapper.error(new Unauthorized('Invalid Token', err))
+
   }
 
 }

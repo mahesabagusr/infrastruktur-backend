@@ -63,9 +63,16 @@ export default class Command {
   // }
 
   async postRegister(payload) {
-    const { uuid, username, firstName, lastName, email, password, signature } = payload;
+    const { uuid, username, firstName, lastName, email, hashPassword, signature } = payload;
     const [result] = await this.db.query('INSERT INTO users (uuid,username,first_name,last_name,email,password,signature) VALUES (?,?,?,?,?,?,?)', {
-      replacements: [uuid, username, firstName, lastName, email, password, signature]
+      replacements: [uuid, username, firstName, lastName, email, hashPassword, signature]
+    })
+    return wrapper.data(result);
+  }
+
+  async postActivity(payload, id) {
+    const [result] = await this.db.query('INSERT INTO history (activity,user_id) VALUES (?,?)', {
+      replacements: [payload, id]
     })
     return wrapper.data(result);
   }

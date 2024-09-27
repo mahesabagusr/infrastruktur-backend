@@ -18,6 +18,19 @@ export default class Query {
   //   }
   // }
 
+  async getUserByEmailOrUsername(payload) {
+    try {
+      const [data] = await this.db.query('SELECT * from users WHERE email  = ? || username = ?', {
+        replacements: [payload || "", payload || ""]
+      });
+
+      return data[0];
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   async emailExist(payload) {
     try {
       const { email } = payload;
@@ -25,6 +38,7 @@ export default class Query {
         replacements: [email]
       });
       return emailExist[0].cnt;
+
     } catch (e) {
       console.log(e)
     }
@@ -33,18 +47,46 @@ export default class Query {
 
   async usernameExist(payload) {
     try {
-
       const { username } = payload;
       const [usernameExist] = await this.db.query('SELECT COUNT(username) as cnt from users WHERE username  = ?', {
         replacements: [username]
       });
 
       return usernameExist[0].cnt;
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async checkEmail(payload) {
+    try {
+      const { email, username = "" } = payload;
+      const [checkEmail] = await this.db.query('SELECT email,username from users WHERE email  = ? || username = ?', {
+        replacements: [email || "", username || ""]
+      });
+
+      return checkEmail[0];
 
     } catch (e) {
       console.log(e)
     }
   }
+
+  async checkPassword(payload) {
+    try {
+      const { password } = payload;
+
+      const [checkPassword] = await this.db.query('SELECT password from users WHERE password  = ?', {
+        replacements: [password]
+      });
+
+      return checkPassword[0];
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
 
 
 
