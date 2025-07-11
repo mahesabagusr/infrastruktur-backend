@@ -1,6 +1,6 @@
 // import joi from 'joi';
-import NotFoundError from '../../../helpers/error/not_found_error.js';
-import * as wrapper from '../../../helpers/utils/wrapper.js';
+import NotFoundError from '../error/not_found_error.js';
+import * as wrapper from './wrapper.js';
 // import joi from 'joi';
 
 const isValidPayload = (payload, model) => {

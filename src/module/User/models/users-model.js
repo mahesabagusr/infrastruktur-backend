@@ -36,4 +36,8 @@ const loginModel = joi.object().keys({
   })
 });
 
-export { registerModel, loginModel }
+const updateUsernameModel = joi.string().required().messages({
+  'string.empty': 'Harap isi nama Lengkap Baru Kamu'
+})
+
+export { registerModel, loginModel, updateUsernameModel }
