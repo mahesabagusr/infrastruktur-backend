@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { config } from '../../infra/global_config.js';
+import { config } from '../infra/global_config.js';
 
 const generateOtp = () => {
   const otp = crypto.randomInt(11111, 99999).toString();

@@ -6,3 +6,6 @@ mocha.txt
 lab.txt
 privateKey.pem
 publicKey.pem
+
+.netlify
+logs

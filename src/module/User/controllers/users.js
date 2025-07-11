@@ -3,9 +3,9 @@ import {
   ERROR as httpError,
   SUCCESS as http,
 } from '../../../helpers/http-status/status_code.js'
-import * as commandHandler from '../services/command/command_handler.js'
-import validator from '../utils/validator.js'
-import { loginModel, registerModel } from '../models/user_model.js'
+import UserService from '../services/users.js';
+import validator from '../../../helpers/utils/validator.js'
+import { loginModel, registerModel } from '../models/users-model.js'
 
 
 const userRegister = async (req, res) => {
@@ -18,7 +18,7 @@ const userRegister = async (req, res) => {
     if (!result) {
       return result
     }
-    return commandHandler.userRegister(result.data)
+    return UserService.register(result.data)
   }
 
   const sendResponse = async (result) => {
@@ -46,7 +46,7 @@ const userLogin = async (req, res) => {
     if (!result) {
       return result
     }
-    return commandHandler.userLogin(result.data)
+    return UserService.login(result.data)
   }
 
   const sendResponse = async (result) => {
