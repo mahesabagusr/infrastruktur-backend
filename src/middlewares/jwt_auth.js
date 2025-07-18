@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
-import { config } from '../helpers/infra/global_config.js'
-import * as wrapper from '../helpers/utils/wrapper.js'
-import Unauthorized from '../helpers/error/unauthorized_error.js';
+import { config } from '@/helpers/infra/global_config.js'
+import * as wrapper from '@/helpers/utils/wrapper.js'
+import Unauthorized from '@/helpers/error/unauthorized_error.js';
 
 const getKey = keyPath => fs.readFileSync(keyPath, 'utf8');
 const privateKey = getKey(config.privateKey);

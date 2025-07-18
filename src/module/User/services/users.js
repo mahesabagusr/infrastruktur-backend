@@ -1,14 +1,14 @@
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
-import User from "../models/users"; 
-import * as wrapper from "../helpers/utils/wrapper"; 
-import { createToken } from "../middlewares/jwt"; 
+import User from "@/module/User/models/users-model.js"
+import * as wrapper from "@/helpers/utils/wrapper.js";
+import { createToken } from "@/middlewares/jwt_auth";
 import {
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
-} from "../helpers/error"; 
+} from "@/helpers/error";
 
 export default class UserService {
   static async register(payload) {

@@ -8,10 +8,10 @@ import {
   GatewayTimeoutError,
   ServiceUnavailableError,
   UnauthorizedError,
-} from '../error/index.js';
-// Assuming your error definitions reside in '../error'
+} from '@/helpers/error/index.js';
 
-import { ERROR as httpError } from '../http-status/status_code.js'; // Assuming your HTTP status code constants are in '../http-status/status_code'
+
+import { ERROR as httpError } from '@/helpers/http-status/status_code.js'; 
 
 const response = (res, type, result, message = '', code = 200) => {
   let status = true;
@@ -55,11 +55,11 @@ const checkErrorCode = (error) => {
     case UnauthorizedError:
       return httpError.UNAUTHORIZED;
     default:
-      return httpError.INTERNAL_SERVER_ERROR; // Handle unexpected errors gracefully
+      return httpError.INTERNAL_SERVER_ERROR; 
   }
 };
 
-const data = (data) => ({ err: null, data }) // No response object needed for successful results
+const data = (data) => ({ err: null, data }) 
 
 // const paginationData = (data, meta) => sendResponse(null, 'success', { data, meta });
 
