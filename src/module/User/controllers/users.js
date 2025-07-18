@@ -1,11 +1,11 @@
-import * as wrapper from '../../../helpers/utils/wrapper.js';
+import * as wrapper from '@/helpers/utils/wrapper.js';
 import {
   ERROR as httpError,
   SUCCESS as http,
-} from '../../../helpers/http-status/status_code.js'
-import UserService from '../services/users.js';
-import validator from '../../../helpers/utils/validator.js'
-import { loginModel, registerModel } from '../models/users-model.js'
+} from '@/helpers/http-status/status_code.js'
+import UserService from '@/services/users.js';
+import * as validator from '@/helpers/utils/validator.js';
+import { registerModel, loginModel } from '@/module/User/models/register.js';
 
 
 const userRegister = async (req, res) => {

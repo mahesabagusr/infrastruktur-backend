@@ -1,7 +1,8 @@
+import 'module-alias';
 import express from 'express';
-import router from './src/routes/routes.js';
-import { mysqlConnection } from './src/helpers/database/mysql.js';
-import { config } from './src/infra/global_config.js';
+import router from '@/routes/routes.js';
+import { mysqlConnection } from '@/helpers/db/mysql.js';
+import config from '@/config/index.js';
 
 const app = express();
 
