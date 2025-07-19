@@ -4,40 +4,75 @@ import {
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
 import UserService from '@/module/User/services/users.js';
-import * as validator from '@/helpers/utils/validator.js';
+import { isValidPayload } from '@/helpers/utils/validator.js';
 import { registerModel, loginModel } from '@/module/User/models/users-model.js';
+import logger from '@/helpers/utils/logger.js';
 
 
 const userRegister = async (req, res) => {
-  const validatePayload = validator.isValidPayload(
-    req.body,
-    registerModel
-  )
+  try {
+    const payload = { ...req.body };
 
-  const postRequest = (result) => {
-    if (!result) {
-      return result
-    }
-    return UserService.register(result.data)
-  }
+    const validatePayload = await isValidPayload(payload, registerModel);
 
-  const sendResponse = async (result) => {
-    result.err
-      ? wrapper.response(
+    if (validatePayload.err) {
+      console.error("Validation error:", validatePayload.err);
+      return wrapper.response(
         res,
-        'fail',
-        result,
-        'User Registration Failed',
-        httpError.NOT_FOUND
-      )
-      : wrapper.response(res, 'success', result, 'User Registration Successfull', http.OK);
-  }
+        "fail",
+        { err: validatePayload.err, data: null },
+        "Invalid Payload",
+        httpError.EXPECTATION_FAILED
+      );
+    }
 
-  await sendResponse(await postRequest(validatePayload));
+    const postRequest = (data) => {
+      return UserService.register(data);
+    };
+
+    const Response = (result) => {
+      if (result.err) {
+        wrapper.response(
+          res,
+          "fail",
+          result,
+          "User Registration Failed",
+          httpError.NOT_FOUND
+        );
+      } else {
+        wrapper.response(
+          res,
+          "success",
+          result,
+          "User Registration Successful",
+          http.OK
+        );
+      }
+    };
+
+    Response(await postRequest(validatePayload.data));
+
+
+  } catch (err) {
+    let errorMessage = "An unexpected error occurred";
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    }
+
+    logger.error(`Unexpected error during user registration: ${errorMessage}`);
+
+    return wrapper.response(
+      res,
+      "fail",
+      { err: errorMessage, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_SERVER_ERROR
+    );
+  }
 };
 
 const userLogin = async (req, res) => {
-  const validatePayload = validator.isValidPayload(
+  const validatePayload = isValidPayload(
     req.body,
     loginModel
   )
