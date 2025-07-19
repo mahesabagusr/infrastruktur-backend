@@ -9,3 +9,6 @@ publicKey.pem
 
 .netlify
 logs
+/src/generated/prisma
+
+/generated/prisma
