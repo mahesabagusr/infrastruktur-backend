@@ -1,22 +1,27 @@
-import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
-import User from "@/module/User/models/users-model.js"
 import * as wrapper from "@/helpers/utils/wrapper.js";
-import { createToken } from "@/middlewares/jwt_auth";
+import { createToken } from "@/middlewares/jwt_auth.js";
 import {
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
-} from "@/helpers/error";
+} from "@/helpers/error/index.js";
+import { PrismaClient } from "generated/prisma/index.js";
 
+const prisma = new PrismaClient();
 export default class UserService {
   static async register(payload) {
     try {
       const { username, email, password } = payload;
 
-      const existingUser = await User.findOne({
-        where: { [Op.or]: [{ email }, { username }] },
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: email },
+            { username: username },
+          ],
+        },
       });
 
       if (existingUser) {
@@ -31,14 +36,17 @@ export default class UserService {
       const signature = nanoid(4);
       const hashPassword = await bcrypt.hash(password, 10);
 
-      await User.create({
-        username,
-        email,
-        password: hashPassword,
-        signature: signature,
+      await prisma.user.create({
+        data: {
+          username,
+          email,
+          password: hashPassword,
+          signature: signature,
+        },
       });
 
       return wrapper.data("User registered successfully.");
+
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }
@@ -49,9 +57,12 @@ export default class UserService {
     try {
       const { identifier, password } = payload;
 
-      const user = await User.findOne({
+      const user = await prisma.user.findFirst({
         where: {
-          [Op.or]: [{ username: identifier }, { email: identifier }],
+          OR: [
+            { username: identifier },
+            { email: identifier }
+          ],
         },
       });
 
@@ -68,6 +79,7 @@ export default class UserService {
       const { accessToken } = await createToken(user);
 
       return wrapper.data({ token: accessToken });
+
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }

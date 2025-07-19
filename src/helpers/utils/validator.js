@@ -1,6 +1,6 @@
 
 import NotFoundError from '@/helpers/error/not_found_error.js';
-import * as wrapper from '@helpers/utils/wrapper.js';
+import * as wrapper from '@/helpers/utils/wrapper.js';
 
 const isValidPayload = (payload, model) => {
   const { value, error } = model.validate(payload);

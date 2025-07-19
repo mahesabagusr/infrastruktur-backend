@@ -1,8 +1,7 @@
-import 'module-alias';
+
 import express from 'express';
 import router from '@/routes/routes.js';
-import { mysqlConnection } from '@/helpers/db/mysql.js';
-import config from '@/config/index.js';
+import { config } from '@/helpers/infra/global_config.js';
 
 const app = express();
 
@@ -17,7 +16,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(router);
 
-mysqlConnection();
 
 const port = config.port;
 

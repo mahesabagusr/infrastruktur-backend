@@ -3,9 +3,9 @@ import {
   ERROR as httpError,
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
-import UserService from '@/services/users.js';
+import UserService from '@/module/User/services/users.js';
 import * as validator from '@/helpers/utils/validator.js';
-import { registerModel, loginModel } from '@/module/User/models/register.js';
+import { registerModel, loginModel } from '@/module/User/models/users-model.js';
 
 
 const userRegister = async (req, res) => {
