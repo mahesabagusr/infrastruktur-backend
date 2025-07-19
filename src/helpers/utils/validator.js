@@ -6,7 +6,6 @@ export const isValidPayload = (payload, model) => {
   const { value, error } = model.validate(payload);
 
   if (error) {
-    console.log(error)
     return wrapper.error(new ExpectationFailed(error.message));
   }
 

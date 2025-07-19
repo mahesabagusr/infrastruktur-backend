@@ -22,17 +22,11 @@ const registerModel = joi.object().keys({
 });
 
 const loginModel = joi.object().keys({
-  username: joi.string().messages({
-    'string.empty': 'Harap isi Username'
+  identifier: joi.string().messages({
+    'string.empty': 'Harap isi Username atau Email'
   }),
-  email: joi.string().email().messages({
-    'string.empty': 'Harap isi Email',
-
-  }),
-  password: joi.string().min(6).regex(regex).required().messages({
+  password: joi.string().required().messages({
     'string.empty': 'Harap isi Password',
-    'string.min': 'Harap isi password minimal 6 karakter ',
-    'string.pattern.base': 'Harap Minimal satu huruf besar'
   })
 });
 
