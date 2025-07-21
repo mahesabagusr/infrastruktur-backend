@@ -7,12 +7,12 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "@/helpers/error/index.js";
-import { PrismaClient } from "generated/prisma/index.js";
+import { prisma } from "@/helpers/db/prisma.js";
 
-const prisma = new PrismaClient();
 export default class UserService {
   static async register(payload) {
     try {
+      console.log(payload);
       const { username, email, password } = payload;
 
       const existingUser = await prisma.user.findFirst({

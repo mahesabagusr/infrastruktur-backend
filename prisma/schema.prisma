@@ -7,6 +7,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
@@ -14,13 +15,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role{
+  user
+  admin
+}
+
+enum VerificationStatus {
+  pending
+  verified
+  rejected
+}
+
+enum progressStage{
+  review
+  inProgress
+  completed
+}
+
 model User {
-  id Int @id @default(autoincrement())
+  user_id Int @id @default(autoincrement())
   email String @unique
   password String
-  name String?
-  role String @default("user")
+  firstName String
+  lastName String?
+  username String
+  role Role @default(user)
   signature String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  reports Report[] @relation("UserReports")
+  verifiedReports Report[] @relation("VerifierReports")
+}
+
+model Report{
+  report_id Int @id @default(autoincrement())
+  title String
+  description String @db.Text
+  photoUrl String
+  latitude Float
+  longitude Float
+  address String @db.Text
+  verificationStatus VerificationStatus @default(pending)
+  verificationNotes String? @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User @relation("UserReports",fields: [author_id], references: [user_id])
+  author_id Int
+
+  verifier User? @relation("VerifierReports", fields: [verifier_id], references: [user_id])
+  verifier_id Int?
+
+  progressUpdates ReportProgress[]
+}
+
+model ReportProgress {
+  report_progress_id Int @id @default(autoincrement())
+  report Report @relation(fields: [report_id], references: [report_id])
+  report_id Int
+  photoUrl String
+  progressNotes String @db.Text
+  stage progressStage @default(review)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Provinces {
+  province_id Int @id @default(autoincrement())
+  name String
+  regencies Regencies[] @relation("ProvinceRegencies")
+}
+
+model Regencies {
+  regency_id Int @id @default(autoincrement())
+  name String
+  province Provinces @relation("ProvinceRegencies",fields: [province_id], references: [province_id])
+  province_id Int
+
 }

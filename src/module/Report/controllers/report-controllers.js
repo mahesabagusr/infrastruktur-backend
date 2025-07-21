@@ -3,16 +3,19 @@ import {
   ERROR as httpError,
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
-import UserService from '@/module/User/services/users.js';
-import * as validator from '@/helpers/utils/validator.js';
+import { isValidPayload } from '@/helpers/utils/validator.js';
+import UserService from '@/module/User/services/users-controllers.js';
+
 import { registerModel, loginModel } from '@/module/User/models/users-model.js';
 
 
 const userRegister = async (req, res) => {
-  const validatePayload = validator.isValidPayload(
+  const validatePayload = isValidPayload(
     req.body,
     registerModel
   )
+
+  console.log(validatePayload);
 
   const postRequest = (result) => {
     if (!result) {
@@ -37,7 +40,7 @@ const userRegister = async (req, res) => {
 };
 
 const userLogin = async (req, res) => {
-  const validatePayload = validator.isValidPayload(
+  const validatePayload = isValidPayload(
     req.body,
     loginModel
   )
