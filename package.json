@@ -40,5 +40,8 @@
     "eslint": "^9.9.1",
     "eslint-config-dicodingacademy": "^0.9.4",
     "globals": "^15.9.0"
+  },
+  "prisma":{
+    "seed" : "node --no-warnings --loader=./custom-loader.mjs prisma/seed.js"
   }
 }
