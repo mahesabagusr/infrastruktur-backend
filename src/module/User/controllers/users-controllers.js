@@ -3,7 +3,7 @@ import {
   ERROR as httpError,
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
-import UserService from '@/module/User/services/users.js';
+import UserService from '@/module/User/services/users-controllers.js';
 import { isValidPayload } from '@/helpers/utils/validator.js';
 import { registerModel, loginModel } from '@/module/User/models/users-model.js';
 import logger from '@/helpers/utils/logger.js';
@@ -77,7 +77,7 @@ const userLogin = async (req, res) => {
       payload,
       loginModel
     )
-    
+
     console.log(validatePayload);
 
     if (validatePayload.err) {
