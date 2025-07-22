@@ -54,7 +54,6 @@ export default class UserService {
     }
   }
 
-
   static async login(payload) {
     try {
       const { identifier, password } = payload;
