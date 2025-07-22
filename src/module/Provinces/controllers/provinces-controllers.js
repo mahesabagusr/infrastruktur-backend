@@ -8,13 +8,8 @@ import ProvinceService from '@/module/Provinces/services/provinces-services.js';
 
 const getAllProvinces = async (req, res) => {
 
-  const { payload } = req.body
-
-  const postRequest = (result) => {
-    if (!result) {
-      return result;
-    }
-    return ProvinceService.getAllProvinces(result.data);
+  const postRequest = () => {
+    return ProvinceService.getAllProvinces();
   };
 
   const sendResponse = async (result) => {
@@ -29,10 +24,27 @@ const getAllProvinces = async (req, res) => {
       : wrapper.response(res, 'success', result, 'Provinces retrieved successfully', http.OK);
   };
 
-  await sendResponse(await postRequest(payload));
+  await sendResponse(await postRequest());
 }
 
+const getAllRegencies = async (req, res) => {
+  const postRequest = () => {
+    return ProvinceService.getAllRegencies();
+  };
 
+  const sendResponse = async (result) => {
+    result.err
+      ? wrapper.response(
+        res,
+        'fail',
+        result,
+        'Failed to retrieve regencies',
+        httpError.NOT_FOUND
+      )
+      : wrapper.response(res, 'success', result, 'Regencies retrieved successfully', http.OK);
+  };
 
+  await sendResponse(await postRequest());
+}
 
-export { getAllProvinces };
+export { getAllProvinces, getAllRegencies };
