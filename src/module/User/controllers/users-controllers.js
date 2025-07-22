@@ -49,8 +49,6 @@ const userRegister = async (req, res) => {
     };
 
     Response(await postRequest(validatePayload.data));
-
-
   } catch (err) {
     let errorMessage = "An unexpected error occurred";
     if (err instanceof Error) {
