@@ -6,5 +6,6 @@
       "generated/*": ["generated/*"]
     }
   },
+  "include": ["src"],
   "exclude": ["node_modules"]
 }
