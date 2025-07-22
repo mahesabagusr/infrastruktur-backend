@@ -1,6 +1,6 @@
 import express from 'express';
 import { userRegister, userLogin } from '@/module/User/controllers/users-controllers.js';
-import { getAllProvinces, getAllRegencies } from '@/module/Provinces/controllers/provinces-controllers.js';
+import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/module/Provinces/controllers/provinces-controllers.js';
 
 const router = express.Router();
 
@@ -13,5 +13,6 @@ router.post('/user/login', userLogin);
 
 router.get('/provinces/getAll', getAllProvinces);
 router.get('/regencies/getAll', getAllRegencies);
+router.post('/regencies/getByProvinceId/:id', getRegenciesByProvincesId);
 
 export default router;

@@ -47,4 +47,26 @@ const getAllRegencies = async (req, res) => {
   await sendResponse(await postRequest());
 }
 
-export { getAllProvinces, getAllRegencies };
+const getRegenciesByProvincesId = async (req, res) => {
+  const payload = req.params.id;
+
+  const postRequest = (result) => {
+    return ProvinceService.getRegenciesByProvinceId(result);
+  }
+
+  const sendResponse = async (result) => {
+    result.err
+      ? wrapper.response(
+        res,
+        'fail',
+        result,
+        'Failed to retrieve regencies',
+        httpError.NOT_FOUND
+      )
+      : wrapper.response(res, 'success', result, 'Regencies retrieved successfully', http.OK);
+  };
+
+  return sendResponse(await postRequest(payload));
+}
+
+export { getAllProvinces, getAllRegencies, getRegenciesByProvincesId };
