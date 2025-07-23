@@ -1,16 +1,11 @@
-import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
 import * as wrapper from "@/helpers/utils/wrapper.js";
-import { createToken } from "@/middlewares/jwt_auth.js";
 import {
   BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
 } from "@/helpers/error/index.js";
 import { prisma } from "@/helpers/db/prisma.js";
 import uploadToCloudinary from "@/module/utils/image-upload.js";
 
-export default class UserService {
+export default class ReportService {
   static async addReport(payload) {
     try {
       console.log(payload)
