@@ -17,5 +17,10 @@ export const config = {
   nodemailerConfig: {
     email: process.env.NODEMAILER_EMAIL,
     password: process.env.NODEMAILER_PASSWORD
+  },
+  cloudinaryConfig: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET
   }
 };

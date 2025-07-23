@@ -6,7 +6,6 @@ import {
 import { isValidPayload } from '@/helpers/utils/validator.js';
 import UserService from '@/module/User/services/users-controllers.js';
 
-import { registerModel, loginModel } from '@/module/User/models/users-model.js';
 
 
 const userRegister = async (req, res) => {
