@@ -1,137 +1,267 @@
-# Report API
 
-A secure and robust backend API for creating user reports with photo uploads. Built with Node.js, Express, and Cloudinary, featuring JWT authentication, location-based services, and auto-generated interactive documentation.
+# 📢 Report API
+
+A **secure and robust backend API** for managing user-submitted reports with image uploads. Built using **Node.js**, **Express**, **Cloudinary**, and featuring **JWT authentication**, **location-based services**, and **interactive documentation** with Swagger.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Features
+---
 
--   **JWT Authentication**: Secure endpoints for user registration and login.
--   **Photo Uploads**: Direct-to-cloud image uploads handled by Cloudinary for reports.
--   **Geographic Data**: Endpoints to fetch Indonesian provinces and regencies.
--   **Validation**: Robust request validation using Joi.
--   **Interactive Documentation**: On-the-fly API docs generated with Swagger.
--   **Structured & Scalable**: Organized project structure for easy maintenance.
+## 🚀 Features
+
+- 🔐 **JWT Authentication** – Secure endpoints for user login and registration.
+- 🖼️ **Image Uploads** – Upload and store images directly to Cloudinary.
+- 📍 **Geographic Data** – Retrieve Indonesian provinces and regencies.
+- ✅ **Validation** – Joi-based request validation.
+- 📚 **Swagger Docs** – Real-time interactive API documentation.
+- 🧱 **Clean Architecture** – Scalable and maintainable project structure.
 
 ---
 
-## Technology Stack
+## 🛠️ Technology Stack
 
--   **Backend**: Node.js, Express.js
--   **Database**: Prisma ORM
--   **Image Handling**: Cloudinary
--   **Authentication**: JSON Web Token (`jsonwebtoken`)
--   **Validation**: Joi
--   **File Handling**: Multer
--   **Environment Variables**: Dotenv
+- **Backend**: Node.js, Express.js  
+- **Database**: Prisma ORM  
+- **Authentication**: JSON Web Token (`jsonwebtoken`)  
+- **Image Hosting**: Cloudinary  
+- **Validation**: Joi  
+- **File Handling**: Multer  
+- **Environment Management**: Dotenv
 
 ---
 
-## Getting Started
-
-Follow these instructions to get the project up and running on your local machine.
+## ⚙️ Getting Started
 
 ### 1. Prerequisites
 
--   Node.js (v14 or higher)
--   npm
--   A free [Cloudinary](https://cloudinary.com/users/register/free) account
+- Node.js (v14 or higher)
+- npm
+- [Cloudinary Account](https://cloudinary.com/users/register/free)
 
 ### 2. Installation
 
-Clone the repository and install the dependencies.
-
 ```bash
 # Clone the repository
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+git clone https://github.com/your-username/your-repo-name.git
 
-# Navigate to the project directory
+# Navigate into the project directory
 cd your-repo-name
 
-# Install NPM packages
+# Install dependencies
 npm install
-3. Environment VariablesCreate a .env file in the root of your project by copying the example file.cp .env.example .env
-Now, open the .env file and fill in your specific credentials.VariableDescriptionExamplePORTThe port the server will run on.5000CLOUDINARY_CLOUD_NAMEYour cloud name from the Cloudinary dashboard.your_cloud_nameCLOUDINARY_API_KEYYour API Key from the Cloudinary dashboard.123456789012345CLOUDINARY_API_SECRETYour API Secret from the Cloudinary dashboard.aBcDeFgHiJkLmNoPqRsTuVwXyZ_12345JWT_SECRETA long, random string used to sign your tokens.this_is_a_very_long_and_secret_random_string4. Running the ServerStart the development server.npm start
-The API will be running at http://localhost:5000.API EndpointsHere is a detailed breakdown of the available API endpoints. The base path /api is assumed.AuthenticationPOST /api/user/registerRegisters a new user in the system.Request Body: application/json{
+```
+
+### 3. Environment Variables
+
+Copy the example file and fill in your environment credentials:
+
+```bash
+cp .env.example .env
+```
+
+Update `.env`:
+
+| Variable              | Description                                 | Example                                    |
+|-----------------------|---------------------------------------------|--------------------------------------------|
+| `PORT`                | Port for the server                         | `5000`                                     |
+| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name               | `your_cloud_name`                          |
+| `CLOUDINARY_API_KEY`  | Cloudinary API key                          | `123456789012345`                          |
+| `CLOUDINARY_API_SECRET` | Cloudinary secret key                    | `your_secret_key_here`                     |
+| `JWT_SECRET`          | Secret string to sign JWT tokens            | `this_is_a_super_secret_key`               |
+
+### 4. Run the Server
+
+```bash
+npm start
+```
+
+The API should now be running at:  
+**http://localhost:5000**
+
+---
+
+## 📫 API Endpoints
+
+> Base URL: `/api`
+
+### 🔐 Authentication
+
+#### `POST /api/user/register`
+
+Register a new user.
+
+**Request Body:**
+
+```json
+{
   "username": "johndoe",
   "email": "john.doe@example.com",
   "password": "password123",
   "firstName": "John",
   "lastName": "Doe"
 }
-Success Response (200 OK):{
-    "status": "success",
-    "data": "User registered successfully.",
-    "message": "User Registration Successful"
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": "User registered successfully.",
+  "message": "User Registration Successful"
 }
-POST /api/user/loginAuthenticates a user using their email or username and returns a JWT token.Request Body: application/json{
+```
+
+---
+
+#### `POST /api/user/login`
+
+Authenticate and receive a JWT token.
+
+**Request Body:**
+
+```json
+{
   "identifier": "john.doe@example.com",
   "password": "password123"
 }
-Success Response (200 OK):{
-    "status": "success",
-    "data": {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "token": "your_jwt_token_here"
+  },
+  "message": "User Login Successful"
+}
+```
+
+---
+
+### 📝 Reports
+
+#### `POST /api/report/add` _(Protected)_
+
+Create a new report with photo.
+
+**Headers:**
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Form Data (multipart/form-data):**
+
+| Field       | Type   | Required | Description                       |
+|-------------|--------|----------|-----------------------------------|
+| `photo`     | File   | Yes      | Report image                      |
+| `title`     | String | Yes      | Report title                      |
+| `description` | String | Yes   | Detailed description              |
+| `latitude`  | Number | Yes      | Latitude coordinate               |
+| `longitude` | Number | Yes      | Longitude coordinate              |
+| `address`   | String | Yes      | Street address                    |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "report_id": 587,
+    "title": "Pothole on Main St",
+    "description": "A very large pothole is causing traffic issues.",
+    "latitude": -6.2088,
+    "longitude": 106.8456,
+    "address": "Jl. Jenderal Sudirman No.Kav. 52-53, Jakarta",
+    "photoUrl": "https://res.cloudinary.com/your_cloud_name/image/upload/...jpg",
+    "author_id": 123,
+    "createdAt": "2025-07-23T06:30:00.000Z",
+    "verificationStatus": "pending"
+  },
+  "message": "Report added successfully"
+}
+```
+
+---
+
+### 🌍 Geographic Data
+
+#### `GET /api/provinces/getAll`
+
+Get all provinces in Indonesia.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": [
+    { "id": "11", "name": "ACEH" },
+    { "id": "12", "name": "SUMATERA UTARA" }
+  ],
+  "message": "Provinces retrieved successfully"
+}
+```
+
+---
+
+#### `GET /api/regencies/getAll`
+
+Get all regencies (kabupaten/kota).
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "1101",
+      "province_id": "11",
+      "name": "KABUPATEN SIMEULUE",
+      "province": {
+        "name": "ACEH"
+      }
+    }
+  ],
+  "message": "Regencies retrieved successfully"
+}
+```
+
+---
+
+#### `POST /api/regencies/getByProvinceId/:id`
+
+Get regencies by specific province ID.
+
+**URL Param:** `id` – Province ID (e.g., `11`)
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "1101",
+      "province_id": "11",
+      "name": "KABUPATEN SIMEULUE"
     },
-    "message": "User Login Successful"
+    {
+      "id": "1102",
+      "province_id": "11",
+      "name": "KABUPATEN ACEH SINGKIL"
+    }
+  ],
+  "message": "Regencies retrieved successfully"
 }
-ReportsPOST /api/report/addCreates a new report. This is a protected endpoint and requires a valid JWT. The request must be multipart/form-data.Headers:Authorization: Bearer <YOUR_JWT_TOKEN>Request Body: multipart/form-dataKeyTypeDescriptionphotoFileRequired. The image file for the report.titleStringRequired. The title of the report.descriptionStringRequired. A detailed description of the report.latitudeNumberRequired. The latitude of the report location.longitudeNumberRequired. The longitude of the report location.addressStringRequired. The street address of the report.Success Response (201 Created):{
-    "status": "success",
-    "data": {
-        "report_id": 587,
-        "title": "Pothole on Main St",
-        "description": "A very large pothole is causing traffic issues.",
-        "latitude": -6.2088,
-        "longitude": 106.8456,
-        "address": "Jl. Jenderal Sudirman No.Kav. 52-53, Jakarta",
-        "photoUrl": "[https://res.cloudinary.com/your_cloud_name/image/upload/v16.../reports/....jpg](https://res.cloudinary.com/your_cloud_name/image/upload/v16.../reports/....jpg)",
-        "author_id": 123,
-        "createdAt": "2025-07-23T06:30:00.000Z",
-        "verificationStatus": "pending"
-    },
-    "message": "Report added successfully"
-}
-Geographic DataGET /api/provinces/getAllRetrieves a list of all provinces in Indonesia.Success Response (200 OK):{
-    "status": "success",
-    "data": [
-        {
-            "id": "11",
-            "name": "ACEH"
-        },
-        {
-            "id": "12",
-            "name": "SUMATERA UTARA"
-        }
-    ],
-    "message": "Provinces retrieved successfully"
-}
-GET /api/regencies/getAllRetrieves a list of all regencies (kabupaten/kota) in Indonesia.Success Response (200 OK):{
-    "status": "success",
-    "data": [
-        {
-            "id": "1101",
-            "province_id": "11",
-            "name": "KABUPATEN SIMEULUE",
-            "province": {
-                "name": "ACEH"
-            }
-        }
-    ],
-    "message": "Regencies retrieved successfully"
-}
-POST /api/regencies/getByProvinceId/:idRetrieves a list of regencies for a specific province ID.URL Parameter:id: The ID of the province (e.g., 11 for Aceh).Success Response (200 OK):{
-    "status": "success",
-    "data": [
-        {
-            "id": "1101",
-            "province_id": "11",
-            "name": "KABUPATEN SIMEULUE"
-        },
-        {
-            "id": "1102",
-            "province_id": "11",
-            "name": "KABUPATEN ACEH SINGKIL"
-        }
-    ],
-    "message": "Regencies retrieved successfully"
-}
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
