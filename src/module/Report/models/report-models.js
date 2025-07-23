@@ -1,39 +1,14 @@
 import joi from 'joi';
-const regex = /^(?=.*[a-z])(?=.*[A-Z])/
 
-const registerModel = joi.object().keys({
-  username: joi.string().required().messages({
-    'string.empty': 'Harap isi Username'
-  }),
-  firstName: joi.string().required().messages({
-    'string.empty': 'Harap isi Nama Lengkap'
-  }),
-  lastName: joi.string().required().messages({
-    'string.empty': 'Harap isi Nama Lengkap'
-  }),
+const reportModel = joi.object({
+  title: joi.string().min(3).max(100).required(),
+  description: joi.string().min(10).required(),
+  latitude: joi.number().min(-90).max(90).required(),
+  longitude: joi.number().min(-180).max(180).required(),
+  address: joi.string().min(10).required(),
   email: joi.string().email().required().messages({
     'string.empty': 'Harap isi Email',
   }),
-  password: joi.string().min(6).regex(regex).required().messages({
-    'string.empty': 'Harap isi Password',
-    'string.min': 'Harap isi password minimal 6 karakter ',
-    'string.pattern.base': 'Harap Minimal satu huruf besar'
-  })
 });
 
-const loginModel = joi.object().keys({
-  username: joi.string().messages({
-    'string.empty': 'Harap isi Username'
-  }),
-  email: joi.string().email().messages({
-    'string.empty': 'Harap isi Email',
-
-  }),
-  password: joi.string().min(6).regex(regex).required().messages({
-    'string.empty': 'Harap isi Password',
-    'string.min': 'Harap isi password minimal 6 karakter ',
-    'string.pattern.base': 'Harap Minimal satu huruf besar'
-  })
-});
-
-export { registerModel, loginModel }
+export { reportModel }

@@ -62,7 +62,7 @@ const userRegister = async (req, res) => {
       "fail",
       { err: errorMessage, data: null },
       "An unexpected error occurred",
-      httpError.INTERNAL_SERVER_ERROR
+      httpError.INTERNAL_ERROR
     );
   }
 };
@@ -128,7 +128,7 @@ const userLogin = async (req, res) => {
       "fail",
       { err: errorMessage, data: null },
       "An unexpected error occurred",
-      httpError.INTERNAL_SERVER_ERROR
+      httpError.INTERNAL_ERROR
     );
   }
 };
