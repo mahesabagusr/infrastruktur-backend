@@ -1,84 +1,49 @@
-import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
 import * as wrapper from "@/helpers/utils/wrapper.js";
-import { createToken } from "@/middlewares/jwt_auth.js";
 import {
   BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
 } from "@/helpers/error/index.js";
 import { prisma } from "@/helpers/db/prisma.js";
+import uploadToCloudinary from "@/module/utils/image-upload.js";
 
-export default class UserService {
-  static async register(payload) {
+export default class ReportService {
+  static async addReport(payload) {
     try {
-      console.log(payload);
-      const { username, email, password } = payload;
+      console.log(payload)
+      const { title, description, latitude, longitude, address, email, image } = payload;
 
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { email: email },
-            { username: username },
-          ],
-        },
-      });
+      const uploadResult = await uploadToCloudinary(image);
 
-      if (existingUser) {
-        const message =
-          existingUser.email === email
-            ? "Email is already in use."
-            : "Username is already taken.";
-
-        return wrapper.error(new UnauthorizedError(message));
+      if (!uploadResult) {
+        return wrapper.error(new BadRequestError("Image upload failed"));
       }
 
-      const signature = nanoid(4);
-      const hashPassword = await bcrypt.hash(password, 10);
+      const imageUrl = uploadResult.secure_url;
 
-      await prisma.user.create({
+      const author = await prisma.user.findFirst({
+        where: {
+          email: email,
+        },
+      })
+
+      console.log(author);
+
+      const newReport = await prisma.report.create({
         data: {
-          username,
-          email,
-          password: hashPassword,
-          signature: signature,
-        },
-      });
+          title,
+          description,
+          latitude,
+          longitude,
+          address,
+          author_id: author.user_id,
+          photoUrl: imageUrl,
+        }
+      })
 
-      return wrapper.data("User registered successfully.");
-
-    } catch (err) {
-      return wrapper.error(new BadRequestError(err.message));
-    }
-  }
-
-
-  static async login(payload) {
-    try {
-      const { identifier, password } = payload;
-
-      const user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { username: identifier },
-            { email: identifier }
-          ],
-        },
-      });
-
-      if (!user) {
-        return wrapper.error(new NotFoundError("User not found."));
+      if (!newReport) {
+        return wrapper.error(new BadRequestError("Failed to create report"));
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordValid) {
-        return wrapper.error(new UnauthorizedError("Incorrect password."));
-      }
-
-      const { accessToken } = await createToken(user);
-
-      return wrapper.data({ token: accessToken });
+      return wrapper.data(newReport);
 
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));

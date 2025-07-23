@@ -41,4 +41,29 @@ export default class ProvinceService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+  static async getRegenciesByProvinceId(provinceId) {
+    try {
+      const regencies = await prisma.regencies.findMany({
+        where: {
+          province_id: parseInt(provinceId),
+        },
+        include: {
+          province: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!regencies || regencies.length === 0) {
+        return wrapper.error(new BadRequestError("No regencies found for this province."));
+      }
+      
+      return wrapper.data(regencies);
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 }

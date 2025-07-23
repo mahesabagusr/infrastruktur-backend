@@ -22,7 +22,7 @@ export const createRefreshToken = (data) => {
   const refreshToken = jwt.sign(
     { id: data.id, name: data.name, email: data.email, signature: data.signature },
     privateKey,
-    { algorithm: 'RS256', expiresIn: '1d' }
+    { algorithm: 'RS256', expiresIn: '1w' }
   );
 
   return { refreshToken };

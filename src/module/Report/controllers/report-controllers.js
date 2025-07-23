@@ -4,67 +4,73 @@ import {
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
 import { isValidPayload } from '@/helpers/utils/validator.js';
-import UserService from '@/module/User/services/users-controllers.js';
+import { reportModel } from '@/module/Report/models/report-models.js';
+import ReportService from '@/module/Report/services/report-services.js';
+import logger from '@/helpers/utils/logger.js';
+import { BadRequestError } from '@/helpers/error/index.js';
 
-import { registerModel, loginModel } from '@/module/User/models/users-model.js';
+const addReport = async (req, res) => {
+  try {
+    const payload = { ...req.body, email: req.email };
 
-
-const userRegister = async (req, res) => {
-  const validatePayload = isValidPayload(
-    req.body,
-    registerModel
-  )
-
-  console.log(validatePayload);
-
-  const postRequest = (result) => {
-    if (!result) {
-      return result
-    }
-    return UserService.register(result.data)
-  }
-
-  const sendResponse = async (result) => {
-    result.err
-      ? wrapper.response(
+    if (!req.file) {
+      return wrapper.response(
         res,
-        'fail',
-        result,
-        'User Registration Failed',
-        httpError.NOT_FOUND
-      )
-      : wrapper.response(res, 'success', result, 'User Registration Successfull', http.OK);
-  }
-
-  await sendResponse(await postRequest(validatePayload));
-};
-
-const userLogin = async (req, res) => {
-  const validatePayload = isValidPayload(
-    req.body,
-    loginModel
-  )
-
-  const postRequest = (result) => {
-    if (!result) {
-      return result
+        "fail",
+        { err: new BadRequestError("Image file is required") },
+        httpError.BAD_REQUEST
+      );
     }
-    return UserService.login(result.data)
-  }
 
-  const sendResponse = async (result) => {
-    result.err
-      ? wrapper.response(
+    const validatePayload = await isValidPayload(payload, reportModel);
+
+    if (validatePayload.err) {
+      return wrapper.response(
         res,
-        'fail',
-        result,
-        'User Registration Failed',
-        httpError.NOT_FOUND
-      )
-      : wrapper.response(res, 'success', result, 'User Registration Successfull', http.OK);
+        "fail",
+        { err: validatePayload.err, data: null },
+        "Invalid Payload",
+        httpError.EXPECTATION_FAILED
+      );
+    }
+
+    const postRequest = async (data) => {
+      return await ReportService.addReport(data)
+    }
+
+    const sendResponse = async (result) => {
+      console.log(result);
+      result.err
+        ? wrapper.response(
+          res,
+          "fail",
+          result,
+          "Failed to add report",
+          httpError.NOT_FOUND
+        )
+        : wrapper.response(
+          res,
+          "success",
+          result,
+          "Report added successfully",
+          http.CREATED
+        );
+    }
+
+    return sendResponse(await postRequest({ ...validatePayload.data, image: req.file.buffer }));
+
+  } catch (err) {
+
+    logger.error(`Unexpected error during upload Report: ${err.message}`);
+
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
   }
+}
 
-  sendResponse(await postRequest(validatePayload));
-};
-
-export { userRegister, userLogin };
+export { addReport };
