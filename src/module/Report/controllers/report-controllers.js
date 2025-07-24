@@ -17,7 +17,7 @@ const addReport = async (req, res) => {
       return wrapper.response(
         res,
         "fail",
-        { err: new BadRequestError("Image file is required") },
+        { err: new BadRequestError("File gambar diperlukan") },
         httpError.BAD_REQUEST
       );
     }
@@ -45,14 +45,14 @@ const addReport = async (req, res) => {
           res,
           "fail",
           result,
-          "Failed to add report",
+          "Gagal menambahkan laporan",
           httpError.NOT_FOUND
         )
         : wrapper.response(
           res,
           "success",
           result,
-          "Report added successfully",
+          "Berhasil menambahkan laporan",
           http.CREATED
         );
     }
