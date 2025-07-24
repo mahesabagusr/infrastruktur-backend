@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import * as wrapper from "@/helpers/utils/wrapper.js";
-import { createToken } from "@/middlewares/jwt_auth.js";
+import { createToken } from "@/middlewares/jwt-auth.js";
 import {
   BadRequestError,
   NotFoundError,

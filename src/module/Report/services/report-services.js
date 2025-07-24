@@ -50,4 +50,13 @@ export default class ReportService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+  static async addReportProgress(payload) {
+    try {
+      console.log(payload)
+
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 }
