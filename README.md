@@ -1,9 +1,13 @@
+# 🏙️ JagaKota
 
-# 📢 Report API
+A **secure and robust backend API** for managing user-submitted reports with image uploads. Built using **Node.js**, **Express**, **Cloudinary**, and featuring **JWT authentication**
 
-A **secure and robust backend API** for managing user-submitted reports with image uploads. Built using **Node.js**, **Express**, **Cloudinary**, and featuring **JWT authentication**, **location-based services**, and **interactive documentation** with Swagger.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%234479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
 ---
 
@@ -20,12 +24,12 @@ A **secure and robust backend API** for managing user-submitted reports with ima
 
 ## 🛠️ Technology Stack
 
-- **Backend**: Node.js, Express.js  
-- **Database**: Prisma ORM  
-- **Authentication**: JSON Web Token (`jsonwebtoken`)  
-- **Image Hosting**: Cloudinary  
-- **Validation**: Joi  
-- **File Handling**: Multer  
+- **Backend**: Node.js, Express.js
+- **Database**: Prisma ORM
+- **Authentication**: JSON Web Token (`jsonwebtoken`)
+- **Image Hosting**: Cloudinary
+- **Validation**: Joi
+- **File Handling**: Multer
 - **Environment Management**: Dotenv
 
 ---
@@ -61,13 +65,13 @@ cp .env.example .env
 
 Update `.env`:
 
-| Variable              | Description                                 | Example                                    |
-|-----------------------|---------------------------------------------|--------------------------------------------|
-| `PORT`                | Port for the server                         | `5000`                                     |
-| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name               | `your_cloud_name`                          |
-| `CLOUDINARY_API_KEY`  | Cloudinary API key                          | `123456789012345`                          |
-| `CLOUDINARY_API_SECRET` | Cloudinary secret key                    | `your_secret_key_here`                     |
-| `JWT_SECRET`          | Secret string to sign JWT tokens            | `this_is_a_super_secret_key`               |
+| Variable                | Description                      | Example                      |
+| ----------------------- | -------------------------------- | ---------------------------- |
+| `PORT`                  | Port for the server              | `5000`                       |
+| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name       | `your_cloud_name`            |
+| `CLOUDINARY_API_KEY`    | Cloudinary API key               | `123456789012345`            |
+| `CLOUDINARY_API_SECRET` | Cloudinary secret key            | `your_secret_key_here`       |
+| `JWT_SECRET`            | Secret string to sign JWT tokens | `this_is_a_super_secret_key` |
 
 ### 4. Run the Server
 
@@ -155,14 +159,14 @@ Authorization: Bearer <JWT_TOKEN>
 
 **Form Data (multipart/form-data):**
 
-| Field       | Type   | Required | Description                       |
-|-------------|--------|----------|-----------------------------------|
-| `photo`     | File   | Yes      | Report image                      |
-| `title`     | String | Yes      | Report title                      |
-| `description` | String | Yes   | Detailed description              |
-| `latitude`  | Number | Yes      | Latitude coordinate               |
-| `longitude` | Number | Yes      | Longitude coordinate              |
-| `address`   | String | Yes      | Street address                    |
+| Field         | Type   | Required | Description          |
+| ------------- | ------ | -------- | -------------------- |
+| `photo`       | File   | Yes      | Report image         |
+| `title`       | String | Yes      | Report title         |
+| `description` | String | Yes      | Detailed description |
+| `latitude`    | Number | Yes      | Latitude coordinate  |
+| `longitude`   | Number | Yes      | Longitude coordinate |
+| `address`     | String | Yes      | Street address       |
 
 **Response:**
 
