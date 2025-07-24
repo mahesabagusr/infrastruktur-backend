@@ -23,9 +23,10 @@ export default class ReportService {
         where: {
           email: email,
         },
+        select: {
+          user_id: true,
+        },
       })
-
-      console.log(author);
 
       const newReport = await prisma.report.create({
         data: {

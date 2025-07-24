@@ -48,7 +48,5 @@ export const verifyToken = async (req, res, next) => {
 
   } catch (err) {
     return wrapper.error(new Unauthorized('Invalid Token', err))
-
   }
-
 }

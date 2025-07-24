@@ -16,20 +16,20 @@ datasource db {
 }
 
 enum Role{
-  user
-  admin
+  USER
+  ADMIN
 }
 
 enum VerificationStatus {
-  pending
-  verified
-  rejected
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 enum progressStage{
-  review
-  inProgress
-  completed
+  REVIEW
+  INPROGRESS
+  COMPLETED
 }
 
 model User {
@@ -39,7 +39,7 @@ model User {
   firstName String
   lastName String?
   username String
-  role Role @default(user)
+  role Role @default(USER)
   signature String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,7 +55,7 @@ model Report{
   latitude Float
   longitude Float
   address String @db.Text
-  verificationStatus VerificationStatus @default(pending)
+  verificationStatus VerificationStatus @default(PENDING)
   verificationNotes String? @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,7 +75,7 @@ model ReportProgress {
   report_id Int
   photoUrl String
   progressNotes String @db.Text
-  stage progressStage @default(review)
+  stage progressStage @default(REVIEW)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -91,5 +91,4 @@ model Regencies {
   name String
   province Provinces @relation("ProvinceRegencies",fields: [province_id], references: [province_id])
   province_id Int
-
 }

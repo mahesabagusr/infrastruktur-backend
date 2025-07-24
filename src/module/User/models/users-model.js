@@ -1,24 +1,42 @@
 import joi from 'joi';
-const regex = /^(?=.*[a-z])(?=.*[A-Z])/
+const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
 
 const registerModel = joi.object().keys({
-  username: joi.string().required().messages({
-    'string.empty': 'Harap isi Username'
+  username: joi.string().alphanum().min(3).max(30).required().messages({
+    'string.base': 'Username harus berupa teks.',
+    'string.empty': 'Username tidak boleh kosong.',
+    'string.alphanum': 'Username hanya boleh berisi huruf dan angka.',
+    'string.min': 'Username minimal harus {#limit} karakter.',
+    'string.max': 'Username maksimal harus {#limit} karakter.',
+    'any.required': 'Username wajib diisi.',
   }),
-  firstName: joi.string().required().messages({
-    'string.empty': 'Harap isi Nama Lengkap'
+
+  firstName: joi.string().max(50).required().messages({
+    'string.base': 'Nama depan harus berupa teks.',
+    'string.empty': 'Nama depan tidak boleh kosong.',
+    'string.max': 'Nama depan maksimal harus {#limit} karakter.',
+    'any.required': 'Nama depan wajib diisi.',
   }),
-  lastName: joi.string().required().messages({
-    'string.empty': 'Harap isi Nama Lengkap'
+
+  lastName: joi.string().max(50).allow('').messages({
+    'string.base': 'Nama belakang harus berupa teks.',
+    'string.max': 'Nama belakang maksimal harus {#limit} karakter.',
   }),
-  email: joi.string().email().required().messages({
-    'string.empty': 'Harap isi Email',
+
+  email: joi.string().email({ tlds: { allow: false } }).required().messages({
+    'string.base': 'Email harus berupa teks.',
+    'string.empty': 'Email tidak boleh kosong.',
+    'string.email': 'Format email tidak valid.',
+    'any.required': 'Email wajib diisi.',
   }),
-  password: joi.string().min(6).regex(regex).required().messages({
-    'string.empty': 'Harap isi Password',
-    'string.min': 'Harap isi password minimal 6 karakter ',
-    'string.pattern.base': 'Harap Minimal satu huruf besar'
-  })
+
+  password: joi.string().min(8).pattern(regex).required().messages({
+    'string.base': 'Password harus berupa teks.',
+    'string.empty': 'Password tidak boleh kosong.',
+    'string.min': 'Password minimal harus {#limit} karakter.',
+    'string.pattern.base': 'Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka.',
+    'any.required': 'Password wajib diisi.',
+  }),
 });
 
 const loginModel = joi.object().keys({
