@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
   previewFeatures = ["multiSchema"]
 }
 
@@ -15,7 +15,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role{
+enum Role {
   USER
   ADMIN
 }
@@ -26,69 +26,80 @@ enum VerificationStatus {
   REJECTED
 }
 
-enum progressStage{
+enum progressStage {
   REVIEW
   INPROGRESS
   COMPLETED
 }
 
 model User {
-  user_id Int @id @default(autoincrement())
-  email String @unique
-  password String
-  firstName String
-  lastName String?
-  username String
-  role Role @default(USER)
-  signature String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  reports Report[] @relation("UserReports")
-  verifiedReports Report[] @relation("VerifierReports")
+  user_id         Int       @id @default(autoincrement())
+  email           String    @unique
+  password        String
+  firstName       String
+  lastName        String?
+  username        String
+  address         String    @db.Text
+  phoneNumber     String?
+  role            Role      @default(USER)
+  signature       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  province        Provinces @relation("ProvinceUser", fields: [province_id], references: [province_id])
+  province_id     Int
+  regency         Regencies @relation("RegencyUser", fields: [regency_id], references: [regency_id])
+  regency_id      Int
+  reports         Report[]  @relation("UserReports")
+  verifiedReports Report[]  @relation("VerifierReports")
 }
 
-model Report{
-  report_id Int @id @default(autoincrement())
-  title String
-  description String @db.Text
-  photoUrl String
-  latitude Float
-  longitude Float
-  address String @db.Text
+model Report {
+  report_id          Int                @id @default(autoincrement())
+  title              String
+  description        String             @db.Text
+  photoUrl           String
+  latitude           Float
+  longitude          Float
+  address            String             @db.Text
   verificationStatus VerificationStatus @default(PENDING)
-  verificationNotes String? @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  author User @relation("UserReports",fields: [author_id], references: [user_id])
-  author_id Int
-
-  verifier User? @relation("VerifierReports", fields: [verifier_id], references: [user_id])
-  verifier_id Int?
-
-  progressUpdates ReportProgress[]
+  verificationNotes  String?            @db.Text
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  author             User               @relation("UserReports", fields: [author_id], references: [user_id])
+  author_id          Int
+  verifier           User?              @relation("VerifierReports", fields: [verifier_id], references: [user_id])
+  verifier_id        Int?
+  province           Provinces          @relation("ProvinceReport", fields: [province_id], references: [province_id])
+  province_id        Int
+  regency            Regencies          @relation("RegencyReport", fields: [regency_id], references: [regency_id])
+  regency_id         Int
+  progressUpdates    ReportProgress[]
 }
 
 model ReportProgress {
-  report_progress_id Int @id @default(autoincrement())
-  report Report @relation(fields: [report_id], references: [report_id])
-  report_id Int
-  photoUrl String
-  progressNotes String @db.Text
-  stage progressStage @default(REVIEW)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  report_progress_id Int           @id @default(autoincrement())
+  report             Report        @relation(fields: [report_id], references: [report_id])
+  report_id          Int
+  photoUrl           String
+  progressNotes      String        @db.Text
+  stage              progressStage @default(REVIEW)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 model Provinces {
-  province_id Int @id @default(autoincrement())
-  name String
-  regencies Regencies[] @relation("ProvinceRegencies")
+  province_id Int         @id @default(autoincrement())
+  name        String
+  regencies   Regencies[] @relation("ProvinceRegencies")
+  user        User[]      @relation("ProvinceUser")
+  report      Report[]    @relation("ProvinceReport")
 }
 
 model Regencies {
-  regency_id Int @id @default(autoincrement())
-  name String
-  province Provinces @relation("ProvinceRegencies",fields: [province_id], references: [province_id])
+  regency_id  Int       @id @default(autoincrement())
+  name        String
+  province    Provinces @relation("ProvinceRegencies", fields: [province_id], references: [province_id])
   province_id Int
+  user        User[]    @relation("RegencyUser")
+  report      Report[]  @relation("RegencyReport")
 }

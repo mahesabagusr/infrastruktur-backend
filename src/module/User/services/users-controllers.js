@@ -13,7 +13,7 @@ export default class UserService {
   static async register(payload) {
     try {
       console.log(payload);
-      const { username, email, password, firstName, lastName } = payload;
+      const { username, email, password, firstName, lastName, address, provinceId, regencyId } = payload;
 
       const existingUser = await prisma.user.findFirst({
         where: {
@@ -44,6 +44,9 @@ export default class UserService {
           lastName,
           password: hashPassword,
           signature: signature,
+          address: address,
+          province_id: provinceId,
+          regency_id: regencyId
         },
       });
 
