@@ -11,7 +11,6 @@ import { BadRequestError } from '@/helpers/error/index.js';
 
 const addReport = async (req, res) => {
   try {
-    const payload = { ...req.body, email: req.email };
 
     if (!req.file) {
       return wrapper.response(
@@ -22,7 +21,7 @@ const addReport = async (req, res) => {
       );
     }
 
-    const validatePayload = await isValidPayload(payload, reportModel);
+    const validatePayload = await isValidPayload(req.body, reportModel);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -33,6 +32,8 @@ const addReport = async (req, res) => {
         httpError.EXPECTATION_FAILED
       );
     }
+
+    const payload = { ...validatePayload.data, email: req.email, image: req.file.buffer };
 
     const postRequest = async (data) => {
       return await ReportService.addReport(data)
@@ -57,7 +58,7 @@ const addReport = async (req, res) => {
         );
     }
 
-    return sendResponse(await postRequest({ ...validatePayload.data, image: req.file.buffer }));
+    return sendResponse(await postRequest(payload));
 
   } catch (err) {
 
@@ -73,4 +74,67 @@ const addReport = async (req, res) => {
   }
 }
 
-export { addReport };
+const addReportProgress = async (req, res) => {
+  try {
+    if (!req.file) {
+      return wrapper.response(
+        res,
+        "fail",
+        { err: new BadRequestError("File gambar diperlukan") },
+        httpError.BAD_REQUEST
+      );
+    }
+
+    const validatePayload = await isValidPayload(req.body, reportModel);
+
+    if (validatePayload.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        { err: validatePayload.err, data: null },
+        "Invalid Payload",
+        httpError.EXPECTATION_FAILED
+      );
+    }
+
+    const payload = { ...validatePayload.data, email: req.email, image: req.file.buffer };
+
+    const postRequest = async (data) => {
+      return await ReportService.addReportProgress(data)
+    }
+
+    const sendResponse = async (result) => {
+      console.log(result);
+      result.err
+        ? wrapper.response(
+          res,
+          "fail",
+          result,
+          "Gagal menambahkan laporan",
+          httpError.NOT_FOUND
+        )
+        : wrapper.response(
+          res,
+          "success",
+          result,
+          "Berhasil menambahkan laporan",
+          http.CREATED
+        );
+    }
+
+    return sendResponse(await postRequest(payload));
+
+  } catch (err) {
+    logger.error(`Unexpected error during addReportProgress: ${err.message}`);
+
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
+export { addReport, addReportProgress };
