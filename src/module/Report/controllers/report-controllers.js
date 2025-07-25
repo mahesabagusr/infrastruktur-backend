@@ -12,7 +12,6 @@ import { BadRequestError } from '@/helpers/error/index.js';
 const addReport = async (req, res) => {
   try {
 
-
     if (!req.file) {
       return wrapper.response(
         res,

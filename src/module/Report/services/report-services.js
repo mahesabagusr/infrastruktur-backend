@@ -53,7 +53,7 @@ export default class ReportService {
 
   static async addReportProgress(payload) {
     try {
-      console.log(payload)
+      const {}
 
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));

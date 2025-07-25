@@ -10,7 +10,7 @@ const privateKey = getKey(config.privateKey);
 
 export const createToken = (data) => {
   const accessToken = jwt.sign(
-    { id: data.id, name: data.name, email: data.email, signature: data.signature },
+    { name: data.name, email: data.email, signature: data.signature, role: data.role },
     privateKey,
     { algorithm: 'RS256', expiresIn: '1d' }
   );
@@ -21,7 +21,7 @@ export const createToken = (data) => {
 export const createRefreshToken = (data) => {
 
   const refreshToken = jwt.sign(
-    { id: data.id, name: data.name, email: data.email, signature: data.signature },
+    { username: data.username, email: data.email, signature: data.signature, role: data.role },
     privateKey,
     { algorithm: 'RS256', expiresIn: '1w' }
   );
@@ -47,7 +47,8 @@ export const verifyToken = async (req, res, next) => {
         return wrapper.response(res, "fail", { err: new Unauthorized('Token has expired') }, "Unauthorized", httpError.UNAUTHORIZED);
       }
 
-      req.email = decoded.email;
+      let { name, email, signature, role } = decoded;
+      Object.assign(req, { name, email, signature, role });
       next();
     })
 

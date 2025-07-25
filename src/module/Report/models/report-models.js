@@ -37,4 +37,6 @@ const reportModel = joi.object({
   }),
 });
 
+const progressModel = joi
+
 export { reportModel }

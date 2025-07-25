@@ -3,7 +3,7 @@ import { userRegister, userLogin } from '@/module/User/controllers/users-control
 import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/module/Provinces/controllers/provinces-controllers.js';
 import { addReport, addReportProgress } from '@/module/Report/controllers/report-controllers.js';
 import { verifyToken } from '@/middlewares/jwt-auth.js';
-import { basicAuth } from '@/middlewares/basic-auth';
+import { basicAuth } from '@/middlewares/basic-auth.js';
 import upload from '@/helpers/utils/multer.js';
 
 const router = express.Router();
@@ -15,10 +15,10 @@ router.get('/', function (req, res) {
 router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
 
-router.get('/provinces/getAll', getAllProvinces);
-router.get('/regencies/getAll', getAllRegencies);
-router.post('/regencies/getByProvinceId/:id', getRegenciesByProvincesId);
+router.get('/provinces', getAllProvinces);
+router.get('/regencies', getAllRegencies);
+router.post('/regencies/:id/regencies', getRegenciesByProvincesId);
 
-router.post('/report/add', verifyToken, upload.single('photo'), addReport);
-router.post('/report/addProgress', verifyToken, basicAuth, upload.single('photo'), addReportProgress);
+router.post('/report', verifyToken, upload.single('photo'), addReport);
+router.post('/report/progress', verifyToken, basicAuth, upload.single('photo'), addReportProgress);
 export default router;
