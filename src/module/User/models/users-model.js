@@ -1,5 +1,6 @@
 import joi from 'joi';
 const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
+const phoneRegex = /^(\+62|62|0)8[1-9][0-9]{7,11}$/;
 
 const registerModel = joi.object().keys({
   username: joi.string().alphanum().min(3).max(30).required().messages({
@@ -36,6 +37,31 @@ const registerModel = joi.object().keys({
     'string.min': 'Password minimal harus {#limit} karakter.',
     'string.pattern.base': 'Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka.',
     'any.required': 'Password wajib diisi.',
+  }),
+
+  address: joi.string().required().messages({
+    'string.base': 'Alamat harus berupa teks.',
+    'string.empty': 'Alamat tidak boleh kosong.',
+    'any.required': 'Alamat wajib diisi.',
+  }),
+
+  phoneNumber: joi.string().pattern(phoneRegex).optional().allow(null, '').messages({
+    'string.base': 'Nomor telepon harus berupa teks.',
+    'string.pattern.base': 'Format nomor telepon yang Anda masukkan tidak valid.',
+  }),
+
+  province_id: joi.number().integer().positive().required().messages({
+    'number.base': 'ID Provinsi harus berupa angka.',
+    'number.integer': 'ID Provinsi harus berupa bilangan bulat.',
+    'number.positive': 'ID Provinsi harus berupa angka positif.',
+    'any.required': 'Provinsi wajib dipilih.',
+  }),
+
+  regency_id: joi.number().integer().positive().required().messages({
+    'number.base': 'ID Kabupaten/Kota harus berupa angka.',
+    'number.integer': 'ID Kabupaten/Kota harus berupa bilangan bulat.',
+    'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',
+    'any.required': 'Kabupaten/Kota wajib dipilih.',
   }),
 });
 
