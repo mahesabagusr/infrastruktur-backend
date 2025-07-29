@@ -4,7 +4,7 @@ import {
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
 import { isValidPayload } from '@/helpers/utils/validator.js';
-import { reportModel } from '@/module/Report/models/report-models.js';
+import { createReportProgressSchema, reportModel } from '@/module/Report/models/report-models.js';
 import ReportService from '@/module/Report/services/report-services.js';
 import logger from '@/helpers/utils/logger.js';
 import { BadRequestError } from '@/helpers/error/index.js';
@@ -85,7 +85,7 @@ const addReportProgress = async (req, res) => {
       );
     }
 
-    const validatePayload = await isValidPayload(req.body, reportModel);
+    const validatePayload = await isValidPayload(req.body, createReportProgressSchema);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -97,7 +97,9 @@ const addReportProgress = async (req, res) => {
       );
     }
 
-    const payload = { ...validatePayload.data, email: req.email, image: req.file.buffer };
+    const { reportId } = req.params
+
+    const payload = { ...validatePayload.data, email: req.email, image: req.file.buffer, reportId };
 
     const postRequest = async (data) => {
       return await ReportService.addReportProgress(data)
