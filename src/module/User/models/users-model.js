@@ -39,7 +39,7 @@ const registerModel = joi.object().keys({
     'any.required': 'Password wajib diisi.',
   }),
 
-  address: joi.string().required().messages({
+  street: joi.string().required().messages({
     'string.base': 'Alamat harus berupa teks.',
     'string.empty': 'Alamat tidak boleh kosong.',
     'any.required': 'Alamat wajib diisi.',
