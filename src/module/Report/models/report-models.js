@@ -1,3 +1,4 @@
+import { VerificationStatus } from 'generated/prisma';
 import joi from 'joi';
 
 const progressStageEnum = ['REVIEW', 'INPROGRESS', 'COMPLETED'];
@@ -47,12 +48,6 @@ const createReportProgressSchema = joi.object({
     'any.required': 'Report ID wajib diisi',
   }),
 
-  photoUrl: joi.string().uri().required().messages({
-    'string.base': 'Photo URL harus berupa teks',
-    'string.uri': 'Photo URL harus berupa URL yang valid',
-    'any.required': 'Photo URL wajib diisi',
-  }),
-
   progressNotes: joi.string().min(10).required().messages({
     'string.base': 'Progress Notes harus berupa teks',
     'string.min': 'Progress Notes minimal harus 10 karakter',
@@ -63,6 +58,12 @@ const createReportProgressSchema = joi.object({
     'string.base': 'Stage harus berupa teks',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
   }),
+
+  verificationStatus : joi.string().valid(...Object.values(VerificationStatus)).required().messages({
+    'string.base': 'Verification Status harus berupa teks',
+    'any.only': `Verification Status harus salah satu dari: ${Object.values(VerificationStatus).join(', ')}`,
+    'any.required': 'Verification Status wajib diisi',
+  })
 });
 
 export { reportModel, createReportProgressSchema }

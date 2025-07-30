@@ -53,7 +53,41 @@ export default class ReportService {
 
   static async addReportProgress(payload) {
     try {
-      const { email, image, report_id, } = payload
+      const { progressNotes, stage, verificationStatus, email, image, reportId, } = payload
+
+      const uploadResult = await uploadToCloudinary(image);
+
+      if (!uploadResult) {
+        return wrapper.error(new BadRequestError("Image upload failed"));
+      }
+
+      const imageUrl = uploadResult.secure_url;
+
+      const author = await prisma.user.findFirst({
+        where: {
+          email: email,
+        },
+        select: {
+          user_id: true,
+        },
+      })
+
+      const newReportProgress = await prisma.reportProgress.create({
+        data: {
+          progressNotes,
+          stage,
+          verificationStatus,
+          author_id: author.user_id,
+          report_id: reportId,
+          photoUrl: imageUrl,
+        }
+      })
+
+      if (!newReportProgress) {
+        return wrapper.error(new BadRequestError("Failed to create report progress"));
+      }
+
+      return wrapper.data(newReportProgress);
 
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));

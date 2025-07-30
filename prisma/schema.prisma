@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// File: prisma/schema.prisma
 
 generator client {
   provider        = "prisma-client-js"
@@ -15,6 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enums tidak diubah
 enum Role {
   USER
   ADMIN
@@ -26,31 +23,31 @@ enum VerificationStatus {
   REJECTED
 }
 
-enum progressStage {
+enum ProgressStage {
   REVIEW
   INPROGRESS
   COMPLETED
 }
 
 model User {
-  user_id         Int       @id @default(autoincrement())
-  email           String    @unique
-  password        String
-  firstName       String
-  lastName        String?
-  username        String
-  address         String    @db.Text
-  phoneNumber     String?
-  role            Role      @default(USER)
-  signature       String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  province        Provinces @relation("ProvinceUser", fields: [province_id], references: [province_id])
-  province_id     Int
-  regency         Regencies @relation("RegencyUser", fields: [regency_id], references: [regency_id])
-  regency_id      Int
-  reports         Report[]  @relation("UserReports")
-  verifiedReports Report[]  @relation("VerifierReports")
+  user_id     Int      @id @default(autoincrement())
+  email       String   @unique
+  password    String
+  firstName   String
+  lastName    String?
+  username    String   @unique
+  phoneNumber String?
+  role        Role     @default(USER)
+  signature   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  address         Address?
+  reports         Report[]         @relation("UserReports")
+  verifiedReports Report[]         @relation("VerifierReports")
+  reviews         ReportProgress[]
+
+  @@index([email])
 }
 
 model Report {
@@ -58,48 +55,81 @@ model Report {
   title              String
   description        String             @db.Text
   photoUrl           String
-  latitude           Float
-  longitude          Float
-  address            String             @db.Text
   verificationStatus VerificationStatus @default(PENDING)
   verificationNotes  String?            @db.Text
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
-  author             User               @relation("UserReports", fields: [author_id], references: [user_id])
-  author_id          Int
-  verifier           User?              @relation("VerifierReports", fields: [verifier_id], references: [user_id])
-  verifier_id        Int?
-  province           Provinces          @relation("ProvinceReport", fields: [province_id], references: [province_id])
-  province_id        Int
-  regency            Regencies          @relation("RegencyReport", fields: [regency_id], references: [regency_id])
-  regency_id         Int
-  progressUpdates    ReportProgress[]
+
+  address Address?
+
+  author    User @relation("UserReports", fields: [author_id], references: [user_id])
+  author_id Int
+
+  verifier    User? @relation("VerifierReports", fields: [verifier_id], references: [user_id])
+  verifier_id Int?
+
+  progressUpdates ReportProgress[]
+
+  @@index([author_id])
+  @@index([verifier_id])
+}
+
+model Address {
+  address_id Int      @id @default(autoincrement())
+  street     String   @db.Text
+  latitude   Float
+  longitude  Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  province    Provinces @relation(fields: [province_id], references: [province_id])
+  province_id Int
+  regency     Regencies @relation(fields: [regency_id], references: [regency_id])
+  regency_id  Int
+
+  user      User?   @relation(fields: [user_id], references: [user_id])
+  user_id   Int?    @unique
+  report    Report? @relation(fields: [report_id], references: [report_id])
+  report_id Int?    @unique
+
+  @@index([province_id])
+  @@index([regency_id])
 }
 
 model ReportProgress {
   report_progress_id Int           @id @default(autoincrement())
-  report             Report        @relation(fields: [report_id], references: [report_id])
-  report_id          Int
   photoUrl           String
   progressNotes      String        @db.Text
-  stage              progressStage @default(REVIEW)
+  stage              ProgressStage @default(REVIEW)
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
+
+  reviewer    User @relation(fields: [reviewer_id], references: [user_id])
+  reviewer_id Int
+
+  report    Report @relation(fields: [report_id], references: [report_id])
+  report_id Int
+
+  @@index([reviewer_id])
+  @@index([report_id])
 }
 
 model Provinces {
-  province_id Int         @id @default(autoincrement())
-  name        String
-  regencies   Regencies[] @relation("ProvinceRegencies")
-  user        User[]      @relation("ProvinceUser")
-  report      Report[]    @relation("ProvinceReport")
+  province_id Int    @id @default(autoincrement())
+  name        String @unique
+
+  regencies Regencies[]
+  addresses Address[]
 }
 
 model Regencies {
-  regency_id  Int       @id @default(autoincrement())
-  name        String
-  province    Provinces @relation("ProvinceRegencies", fields: [province_id], references: [province_id])
+  regency_id Int    @id @default(autoincrement())
+  name       String
+
+  province    Provinces @relation(fields: [province_id], references: [province_id])
   province_id Int
-  user        User[]    @relation("RegencyUser")
-  report      Report[]  @relation("RegencyReport")
+
+  addresses Address[]
+
+  @@index([province_id])
 }
