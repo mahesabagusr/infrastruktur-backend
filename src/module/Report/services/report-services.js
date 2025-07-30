@@ -9,7 +9,7 @@ export default class ReportService {
   static async addReport(payload) {
     try {
       console.log(payload)
-      const { title, description, latitude, longitude, address, email, image } = payload;
+      const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
 
       const uploadResult = await uploadToCloudinary(image);
 
@@ -34,7 +34,13 @@ export default class ReportService {
           description,
           latitude,
           longitude,
-          address,
+          address: {
+            street,
+            longitude,
+            latitude,
+            province_id: provinceId,
+            regency_id: regencyId,
+          },
           author_id: author.user_id,
           photoUrl: imageUrl,
         }
