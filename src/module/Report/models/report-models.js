@@ -1,4 +1,4 @@
-import { VerificationStatus } from 'generated/prisma';
+import { VerificationStatus } from 'generated/prisma/index.js';
 import joi from 'joi';
 
 const progressStageEnum = ['REVIEW', 'INPROGRESS', 'COMPLETED'];
@@ -59,7 +59,7 @@ const createReportProgressSchema = joi.object({
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
   }),
 
-  verificationStatus : joi.string().valid(...Object.values(VerificationStatus)).required().messages({
+  verificationStatus: joi.string().valid(...Object.values(VerificationStatus)).required().messages({
     'string.base': 'Verification Status harus berupa teks',
     'any.only': `Verification Status harus salah satu dari: ${Object.values(VerificationStatus).join(', ')}`,
     'any.required': 'Verification Status wajib diisi',

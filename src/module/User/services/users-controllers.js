@@ -6,7 +6,7 @@ import {
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
-} from "@/helpers/error/index.js";
+} from "@/helpers/error";
 import { prisma } from "@/helpers/db/prisma.js";
 
 export default class UserService {
