@@ -20,7 +20,7 @@ router.get('/regencies', getAllRegencies);
 router.get('/provinces/:id/regencies', getRegenciesByProvincesId);
 
 router.post('/report', verifyToken, upload.single('photo'), addReport);
-router.post('/report/verify/:reportId', verifyToken, basicAuth, upload.single('photo'), verifyReport);
+router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
 router.get('/report', verifyToken, getAllReport)
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 
