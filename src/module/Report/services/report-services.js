@@ -157,5 +157,40 @@ export default class ReportService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+  static getAllReportsByProvince = async (province) => {
+    try {
+      const reports = await prisma.report.findMany({
+        where: {
+          address: {
+            province_id: province,
+          }
+        },
+        select: {
+          report_id: true,
+          title: true,
+          description: true,
+          address: {
+            select: {
+              street: true,
+              latitude: true,
+              longitude: true,
+              province_id: true,
+              regency_id: true,
+            }
+          },
+        }
+      });
+
+      if (!reports) {
+        return wrapper.error(new NotFoundError("Laporan tidak ditemukan untuk provinsi ini"));
+      }
+
+      return wrapper.data(reports);
+
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 }
 

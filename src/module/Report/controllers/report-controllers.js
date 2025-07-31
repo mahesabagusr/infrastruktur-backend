@@ -225,4 +225,41 @@ const getAllReport = async (req, res) => {
   }
 }
 
-export { addReport, addReportProgress, verifyReport, getAllReport };
+const getAllReportsByProvince = async (req, res) => {
+  try {
+    const { province } = req.params;
+
+    const reports = await ReportService.getAllReportsByProvince(province);
+
+    if (reports.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        reports,
+        "Gagal mendapatkan laporan berdasarkan provinsi",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      reports,
+      "Berhasil mendapatkan laporan berdasarkan provinsi",
+      http.OK
+    );
+
+  } catch (err) {
+    logger.error(`Unexpected error during getAllReportsByProvince: ${err.message}`);
+
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
+export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince };
