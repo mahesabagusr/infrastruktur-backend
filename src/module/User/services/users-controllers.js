@@ -39,8 +39,8 @@ export default class UserService {
         data: {
           username,
           email,
-          firstName,
-          lastName,
+          firstname: firstName,
+          lastname: lastName,
           password: hashPassword,
           signature: signature,
           address: {
