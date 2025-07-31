@@ -190,4 +190,39 @@ const addReportProgress = async (req, res) => {
   }
 }
 
-export { addReport, addReportProgress, verifyReport };
+const getAllReport = async (req, res) => {
+  try {
+    const reports = await ReportService.getAllReports();
+
+    if (reports.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        reports,
+        "Gagal mendapatkan laporan",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      reports,
+      "Berhasil mendapatkan laporan",
+      http.OK
+    );
+
+  } catch (err) {
+    logger.error(`Unexpected error during getAllReport: ${err.message}`);
+
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
+export { addReport, addReportProgress, verifyReport, getAllReport };

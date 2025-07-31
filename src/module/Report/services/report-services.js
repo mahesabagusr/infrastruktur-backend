@@ -1,6 +1,7 @@
 import * as wrapper from "@/helpers/utils/wrapper.js";
 import {
   BadRequestError,
+  NotFoundError,
 } from "@/helpers/error/index.js";
 import { prisma } from "@/helpers/db/prisma.js";
 import uploadToCloudinary from "@/module/utils/image-upload.js";
@@ -125,4 +126,36 @@ export default class ReportService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+  static getAllReport = async () => {
+    try {
+
+      const reports = await prisma.report.findMany({
+        select: {
+          report_id: true,
+          title: true,
+          description: true,
+          address: {
+            select: {
+              street: true,
+              latitude: true,
+              longitude: true,
+              province_id: true,
+              regency_id: true,
+            }
+          },
+        }
+      })
+
+      if (!reports) {
+        return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
+      }
+
+      return wrapper.data(reports);
+
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 }
+
