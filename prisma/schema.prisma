@@ -30,17 +30,17 @@ enum ProgressStage {
 }
 
 model User {
-  user_id     Int      @id @default(autoincrement())
-  email       String   @unique
-  password    String
-  firstName   String
-  lastName    String?
-  username    String   @unique
-  phoneNumber String?
-  role        Role     @default(USER)
-  signature   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user_id      Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  firstname    String
+  lastname     String?
+  username     String   @unique
+  phone_number Int
+  role         Role     @default(USER)
+  signature    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   address         Address?
   reports         Report[]         @relation("UserReports")
@@ -51,14 +51,14 @@ model User {
 }
 
 model Report {
-  report_id          Int                @id @default(autoincrement())
-  title              String
-  description        String             @db.Text
-  photoUrl           String
-  verificationStatus VerificationStatus @default(PENDING)
-  verificationNotes  String?            @db.Text
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  report_id           Int                @id @default(autoincrement())
+  title               String
+  description         String             @db.Text
+  photoUrl            String
+  verification_status VerificationStatus @default(PENDING)
+  verification_notes  String?            @db.Text
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   address Address?
 
@@ -98,8 +98,8 @@ model Address {
 
 model ReportProgress {
   report_progress_id Int           @id @default(autoincrement())
-  photoUrl           String
-  progressNotes      String        @db.Text
+  photo_url          String
+  progress_notes     String        @db.Text
   stage              ProgressStage @default(REVIEW)
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt

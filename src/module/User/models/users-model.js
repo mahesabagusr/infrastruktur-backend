@@ -45,7 +45,7 @@ const registerModel = joi.object().keys({
     'any.required': 'Alamat wajib diisi.',
   }),
 
-  phoneNumber: joi.string().pattern(phoneRegex).optional().allow(null, '').messages({
+  phoneNumber: joi.number().pattern(phoneRegex).optional().allow(null, '').messages({
     'string.base': 'Nomor telepon harus berupa teks.',
     'string.pattern.base': 'Format nomor telepon yang Anda masukkan tidak valid.',
   }),

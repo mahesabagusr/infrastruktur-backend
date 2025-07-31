@@ -227,9 +227,9 @@ const getAllReport = async (req, res) => {
 
 const getAllReportsByProvince = async (req, res) => {
   try {
-    const { province } = req.params;
+    const { provinceId } = req.params;
 
-    const reports = await ReportService.getAllReportsByProvince(province);
+    const reports = await ReportService.getAllReportsByProvince(provinceId);
 
     if (reports.err) {
       return wrapper.response(
