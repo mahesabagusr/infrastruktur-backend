@@ -6,7 +6,7 @@ import * as wrapper from '@/helpers/utils/wrapper.js'
 import Unauthorized from '@/helpers/error/unauthorized_error.js';
 
 const getKey = keyPath => fs.readFileSync(keyPath, 'utf8');
-const privateKey = getKey(config.privateKey);
+const privateKey = getKey(config.privateKey) || config.jwtSecretKey;
 
 export const createToken = (data) => {
   const accessToken = jwt.sign(

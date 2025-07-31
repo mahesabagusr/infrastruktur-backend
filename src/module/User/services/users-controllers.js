@@ -12,7 +12,7 @@ import { prisma } from "@/helpers/db/prisma.js";
 export default class UserService {
   static async register(payload) {
     try {
-      const { username, email, password, firstName, lastName, street, longitude, latitude, provinceId, regencyId } = payload;
+      const { username, email, password, firstName, phoneNumber, lastName, street, longitude, latitude, provinceId, regencyId } = payload;
 
       const existingUser = await prisma.user.findFirst({
         where: {
@@ -38,17 +38,20 @@ export default class UserService {
       await prisma.user.create({
         data: {
           username,
-          email,
           firstname: firstName,
           lastname: lastName,
+          email,
           password: hashPassword,
           signature: signature,
+          phone_number: phoneNumber,
           address: {
-            street,
-            longitude,
-            latitude,
-            province_id: provinceId,
-            regency_id: regencyId,
+            create: {
+              street: street,
+              longitude,
+              latitude,
+              province_id: provinceId,
+              regency_id: regencyId,
+            }
           }
         },
       });

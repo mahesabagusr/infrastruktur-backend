@@ -3,7 +3,6 @@
 generator client {
   provider        = "prisma-client-js"
   output          = "../generated/prisma"
-  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
@@ -36,7 +35,7 @@ model User {
   firstname    String
   lastname     String?
   username     String   @unique
-  phone_number Int
+  phone_number String
   role         Role     @default(USER)
   signature    String?
   createdAt    DateTime @default(now())
@@ -77,8 +76,8 @@ model Report {
 model Address {
   address_id Int      @id @default(autoincrement())
   street     String   @db.Text
-  latitude   Float
-  longitude  Float
+  latitude   Float?
+  longitude  Float?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
