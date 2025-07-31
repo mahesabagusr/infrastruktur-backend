@@ -1,4 +1,4 @@
-import { VerificationStatus } from 'generated/prisma/index.js';
+
 import joi from 'joi';
 
 const progressStageEnum = ['REVIEW', 'INPROGRESS', 'COMPLETED'];
@@ -29,7 +29,7 @@ const reportModel = joi.object({
     'number.max': 'Nilai longitude maksimal adalah {#limit}.',
     'any.required': 'Longitude wajib diisi.',
   }),
-  address: joi.string().min(10).required().messages({
+  street: joi.string().min(10).required().messages({
     'string.base': 'Alamat harus berupa teks.',
     'string.empty': 'Alamat tidak boleh kosong.',
     'string.min': 'Alamat minimal harus memiliki {#limit} karakter.',
@@ -39,6 +39,23 @@ const reportModel = joi.object({
     'string.empty': 'Harap isi Email',
   }),
 });
+
+const verifyReportModel = joi.object({
+  reportId: joi.number().integer().positive().required().messages({
+    'number.base': 'Report ID harus berupa angka.',
+    'number.integer': 'Report ID harus berupa bilangan bulat.',
+    'number.positive': 'Report ID harus bernilai positif.',
+    'any.required': 'Report ID wajib diisi.',
+  }),
+  verificationStatus: joi.string().valid('PENDING', 'APPROVED', 'REJECTED').required().messages({
+    'string.base': 'Status verifikasi harus berupa teks.',
+    'any.only': 'Status verifikasi harus salah satu dari: PENDING, APPROVED, REJECTED.',
+    'any.required': 'Status verifikasi wajib diisi.',
+  }),
+  verificationNotes: joi.string().allow('').optional().messages({
+    'string.base': 'Catatan verifikasi harus berupa teks.',
+  }),
+})
 
 const createReportProgressSchema = joi.object({
   report_id: joi.number().integer().positive().required().messages({
@@ -59,11 +76,6 @@ const createReportProgressSchema = joi.object({
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
   }),
 
-  verificationStatus: joi.string().valid(...Object.values(VerificationStatus)).required().messages({
-    'string.base': 'Verification Status harus berupa teks',
-    'any.only': `Verification Status harus salah satu dari: ${Object.values(VerificationStatus).join(', ')}`,
-    'any.required': 'Verification Status wajib diisi',
-  })
 });
 
-export { reportModel, createReportProgressSchema }
+export { reportModel, createReportProgressSchema, verifyReportModel };
