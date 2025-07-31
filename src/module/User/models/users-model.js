@@ -39,7 +39,7 @@ const registerModel = joi.object().keys({
     'any.required': 'Password wajib diisi.',
   }),
 
-  address: joi.string().required().messages({
+  street: joi.string().required().messages({
     'string.base': 'Alamat harus berupa teks.',
     'string.empty': 'Alamat tidak boleh kosong.',
     'any.required': 'Alamat wajib diisi.',
@@ -50,14 +50,14 @@ const registerModel = joi.object().keys({
     'string.pattern.base': 'Format nomor telepon yang Anda masukkan tidak valid.',
   }),
 
-  province_id: joi.number().integer().positive().required().messages({
+  provinceId: joi.number().integer().positive().required().messages({
     'number.base': 'ID Provinsi harus berupa angka.',
     'number.integer': 'ID Provinsi harus berupa bilangan bulat.',
     'number.positive': 'ID Provinsi harus berupa angka positif.',
     'any.required': 'Provinsi wajib dipilih.',
   }),
 
-  regency_id: joi.number().integer().positive().required().messages({
+  regencyId: joi.number().integer().positive().required().messages({
     'number.base': 'ID Kabupaten/Kota harus berupa angka.',
     'number.integer': 'ID Kabupaten/Kota harus berupa bilangan bulat.',
     'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',

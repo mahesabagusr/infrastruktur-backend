@@ -1,5 +1,6 @@
 import path from 'node:path';
-import { pathToFileURL } from 'node:url'; // 1. Import pathToFileURL
+import { pathToFileURL } from 'node:url';
+import fs from 'node:fs';
 
 export default function loadAliases(aliasesToAdd) {
   const getAliases = () => {
@@ -26,9 +27,15 @@ export default function loadAliases(aliasesToAdd) {
       return defaultResolve(specifier, context, defaultResolve);
     }
 
-    const newSpecifier = path.join(aliases[alias], specifier.substring(alias.length));
+    let newSpecifier = path.join(aliases[alias], specifier.substring(alias.length));
 
-    // 2. Convert the path to a file URL before resolving
+    if (fs.existsSync(newSpecifier) && fs.statSync(newSpecifier).isDirectory()) {
+      const indexPath = path.join(newSpecifier, 'index.js');
+      if (fs.existsSync(indexPath)) {
+        newSpecifier = indexPath;
+      }
+    }
+
     return defaultResolve(
       pathToFileURL(newSpecifier).href,
       context,

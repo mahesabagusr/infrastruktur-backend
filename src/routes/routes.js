@@ -20,5 +20,5 @@ router.get('/regencies', getAllRegencies);
 router.post('/regencies/:id/regencies', getRegenciesByProvincesId);
 
 router.post('/report', verifyToken, upload.single('photo'), addReport);
-router.post('/report/progress', verifyToken, basicAuth, upload.single('photo'), addReportProgress);
+router.post('/report/progress/:reportId', verifyToken, basicAuth, upload.single('photo'), addReportProgress);
 export default router;

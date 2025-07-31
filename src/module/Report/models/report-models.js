@@ -1,4 +1,7 @@
+
 import joi from 'joi';
+
+const progressStageEnum = ['REVIEW', 'INPROGRESS', 'COMPLETED'];
 
 const reportModel = joi.object({
   title: joi.string().min(3).max(100).required().messages({
@@ -26,7 +29,7 @@ const reportModel = joi.object({
     'number.max': 'Nilai longitude maksimal adalah {#limit}.',
     'any.required': 'Longitude wajib diisi.',
   }),
-  address: joi.string().min(10).required().messages({
+  street: joi.string().min(10).required().messages({
     'string.base': 'Alamat harus berupa teks.',
     'string.empty': 'Alamat tidak boleh kosong.',
     'string.min': 'Alamat minimal harus memiliki {#limit} karakter.',
@@ -37,6 +40,42 @@ const reportModel = joi.object({
   }),
 });
 
-const progressModel = joi
+const verifyReportModel = joi.object({
+  reportId: joi.number().integer().positive().required().messages({
+    'number.base': 'Report ID harus berupa angka.',
+    'number.integer': 'Report ID harus berupa bilangan bulat.',
+    'number.positive': 'Report ID harus bernilai positif.',
+    'any.required': 'Report ID wajib diisi.',
+  }),
+  verificationStatus: joi.string().valid('PENDING', 'APPROVED', 'REJECTED').required().messages({
+    'string.base': 'Status verifikasi harus berupa teks.',
+    'any.only': 'Status verifikasi harus salah satu dari: PENDING, APPROVED, REJECTED.',
+    'any.required': 'Status verifikasi wajib diisi.',
+  }),
+  verificationNotes: joi.string().allow('').optional().messages({
+    'string.base': 'Catatan verifikasi harus berupa teks.',
+  }),
+})
 
-export { reportModel }
+const createReportProgressSchema = joi.object({
+  report_id: joi.number().integer().positive().required().messages({
+    'number.base': 'Report ID harus berupa angka',
+    'number.integer': 'Report ID harus berupa bilangan bulat',
+    'number.positive': 'Report ID harus bernilai positif',
+    'any.required': 'Report ID wajib diisi',
+  }),
+
+  progressNotes: joi.string().min(10).required().messages({
+    'string.base': 'Progress Notes harus berupa teks',
+    'string.min': 'Progress Notes minimal harus 10 karakter',
+    'any.required': 'Progress Notes wajib diisi',
+  }),
+
+  stage: joi.string().valid(...progressStageEnum).optional().default('REVIEW').messages({
+    'string.base': 'Stage harus berupa teks',
+    'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
+  }),
+
+});
+
+export { reportModel, createReportProgressSchema, verifyReportModel };
