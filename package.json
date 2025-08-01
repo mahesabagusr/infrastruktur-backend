@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=production node index.js",
+    "start": "node --no-warnings --loader=./custom-loader.mjs index.js",
     "dev": "nodemon --no-warnings --loader=./custom-loader.mjs index.js",
     "swagger": "node --no-warnings --loader=./custom-loader.mjs src/helpers/utils/swagger.js"
   },
