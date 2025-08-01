@@ -66,13 +66,6 @@ const verifyReportModel = joi.object({
 })
 
 const createReportProgressSchema = joi.object({
-  report_id: joi.number().integer().positive().required().messages({
-    'number.base': 'Report ID harus berupa angka',
-    'number.integer': 'Report ID harus berupa bilangan bulat',
-    'number.positive': 'Report ID harus bernilai positif',
-    'any.required': 'Report ID wajib diisi',
-  }),
-
   progressNotes: joi.string().min(10).required().messages({
     'string.base': 'Progress Notes harus berupa teks',
     'string.min': 'Progress Notes minimal harus 10 karakter',

@@ -193,7 +193,7 @@ const addReportProgress = async (req, res) => {
 
 const getAllReport = async (req, res) => {
   try {
-    const reports = await ReportService.getAllReports();
+    const reports = await ReportService.getAllReport();
 
     if (reports.err) {
       return wrapper.response(

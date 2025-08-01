@@ -85,7 +85,7 @@ export default class ReportService {
 
   static async addReportProgress(payload) {
     try {
-      const { progressNotes, stage, email, image, reportId, } = payload
+      const { progressNotes: progress_notes, stage, email, image, reportId, } = payload
 
       const author = await prisma.user.findFirst({
         where: {
@@ -110,11 +110,11 @@ export default class ReportService {
 
       const newReportProgress = await prisma.reportProgress.create({
         data: {
-          progressNotes,
+          progress_notes,
           stage,
-          author_id: author.user_id,
-          report_id: reportId,
-          photoUrl: imageUrl,
+          reviewer_id: author.user_id,
+          report_id: parseInt(reportId),
+          photo_url: imageUrl,
         }
       })
 
@@ -137,6 +137,8 @@ export default class ReportService {
           report_id: true,
           title: true,
           description: true,
+          verification_status: true,
+          verification_notes: true,
           address: {
             select: {
               street: true,
