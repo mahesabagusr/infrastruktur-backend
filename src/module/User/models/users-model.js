@@ -49,19 +49,6 @@ const registerModel = joi.object().keys({
     'string.base': 'Nomor telepon harus berupa teks.',
     'string.pattern.base': 'Format nomor telepon yang Anda masukkan tidak valid.',
   }),
-
-  latitude: joi.number().min(-90).max(90).required().messages({
-    'number.base': 'Latitude harus berupa angka.',
-    'number.min': 'Nilai latitude minimal adalah {#limit}.',
-    'number.max': 'Nilai latitude maksimal adalah {#limit}.',
-    'any.required': 'Latitude wajib diisi.',
-  }),
-  longitude: joi.number().min(-180).max(180).required().messages({
-    'number.base': 'Longitude harus berupa angka.',
-    'number.min': 'Nilai longitude minimal adalah {#limit}.',
-    'number.max': 'Nilai longitude maksimal adalah {#limit}.',
-    'any.required': 'Longitude wajib diisi.',
-  }),
   provinceId: joi.number().integer().positive().required().messages({
     'number.base': 'ID Provinsi harus berupa angka.',
     'number.integer': 'ID Provinsi harus berupa bilangan bulat.',

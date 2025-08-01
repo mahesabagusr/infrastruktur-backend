@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: API Lengkap (Auth, Location & Report)
-  description: Dokumentasi API untuk manajemen Pengguna, Lokasi (Provinsi/Kabupaten), dan Laporan.
+  title: JagaKota API Documentation
+  description: Jagakota API Documentation provides a comprehensive overview of the endpoints available for managing user authentication, geographic data, and user reports. This API allows users to register, login, and submit reports about urban issues, while also providing access to location data such as provinces and regencies in Indonesia.
   version: 1.1.0
 servers:
   - url: /
