@@ -6,9 +6,13 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --no-warnings --loader=./custom-loader.mjs index.js",
+    "start": "NODE_ENV=production node index.js",
     "dev": "nodemon --no-warnings --loader=./custom-loader.mjs index.js",
     "swagger": "node --no-warnings --loader=./custom-loader.mjs src/helpers/utils/swagger.js"
+  },
+  "_moduleAliases": {
+    "@": "src",
+    "generated": "generated"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +29,7 @@
     "joi": "^17.13.3",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "multer": "^2.0.2",
     "mysql2": "^3.11.0",
     "nanoid": "^5.0.7",

@@ -9,6 +9,10 @@ import YAML from 'js-yaml';
 const swaggerDocument = YAML.load(fs.readFileSync('./docs/docs.yaml', 'utf8'));
 const app = express();
 
+if (config.env === 'production') {
+  await import('module-alias/register');
+}
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
