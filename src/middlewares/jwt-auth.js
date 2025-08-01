@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
+
 import { ERROR as httpError } from '@/helpers/http-status/status_code.js';
 import { config } from '@/helpers/infra/global_config.js'
 import * as wrapper from '@/helpers/utils/wrapper.js'
 import Unauthorized from '@/helpers/error/unauthorized_error.js';
 
-const getKey = keyPath => fs.readFileSync(keyPath, 'utf8');
-const privateKey = getKey(config.privateKey) || config.jwtSecretKey;
+const privateKey = config.jwtPrivateKey;
+const publicKey = config.jwtPublicKey;
 
 export const createToken = (data) => {
   const accessToken = jwt.sign(
@@ -19,7 +19,6 @@ export const createToken = (data) => {
 }
 
 export const createRefreshToken = (data) => {
-
   const refreshToken = jwt.sign(
     { username: data.username, email: data.email, signature: data.signature, role: data.role },
     privateKey,
@@ -38,7 +37,7 @@ export const verifyToken = async (req, res, next) => {
       return wrapper.response(res, "fail", { err: new Unauthorized('Token is required') }, "Unauthorized", httpError.UNAUTHORIZED);
     }
 
-    jwt.verify(token, privateKey, (err, decoded) => {
+    jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (err, decoded) => {
       if (err instanceof jwt.JsonWebTokenError) {
         return wrapper.response(res, "fail", { err: new Unauthorized('Invalid Token', err) }, "Unauthorized", httpError.UNAUTHORIZED);
       }

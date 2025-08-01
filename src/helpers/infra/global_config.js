@@ -4,9 +4,8 @@ dotnev.config({ path: '.env' })
 
 export const config = {
   port: process.env.EXPRESS_PORT,
-  publicKey: process.env.PUBLIC_KEY_PATH,
-  privateKey: process.env.PRIVATE_KEY_PATH,
-  jwtSecretKey: process.env.JWT_SECRET_KEY,
+  jwtPrivateKey: process.env.JWT_PRIVATE_KEY,
+  jwtPublicKey: process.env.JWT_PUBLIC_KEY,
   nodeEnv: process.env.NODE_ENV,
   mysqlConfig: {
     host: process.env.MYSQL_HOST,
