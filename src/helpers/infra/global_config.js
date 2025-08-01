@@ -7,6 +7,7 @@ export const config = {
   publicKey: process.env.PUBLIC_KEY_PATH,
   privateKey: process.env.PRIVATE_KEY_PATH,
   jwtSecretKey: process.env.JWT_SECRET_KEY,
+  nodeEnv: process.env.NODE_ENV,
   mysqlConfig: {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
