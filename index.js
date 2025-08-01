@@ -9,8 +9,6 @@ import YAML from 'js-yaml';
 const swaggerDocument = YAML.load(fs.readFileSync('./docs/docs.yaml', 'utf8'));
 const app = express();
 
-
-
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -23,7 +21,7 @@ app.use(express.json());
 app.use(router);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-const port = config.port;
+const port = config.port || 8080;
 
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
