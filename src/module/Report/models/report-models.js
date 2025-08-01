@@ -38,18 +38,26 @@ const reportModel = joi.object({
   email: joi.string().email().messages({
     'string.empty': 'Harap isi Email',
   }),
+
+  provinceId: joi.number().integer().positive().required().messages({
+    'number.base': 'ID Provinsi harus berupa angka.',
+    'number.integer': 'ID Provinsi harus berupa bilangan bulat.',
+    'number.positive': 'ID Provinsi harus berupa angka positif.',
+    'any.required': 'Provinsi wajib dipilih.',
+  }),
+
+  regencyId: joi.number().integer().positive().required().messages({
+    'number.base': 'ID Kabupaten/Kota harus berupa angka.',
+    'number.integer': 'ID Kabupaten/Kota harus berupa bilangan bulat.',
+    'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',
+    'any.required': 'Kabupaten/Kota wajib dipilih.',
+  }),
 });
 
 const verifyReportModel = joi.object({
-  reportId: joi.number().integer().positive().required().messages({
-    'number.base': 'Report ID harus berupa angka.',
-    'number.integer': 'Report ID harus berupa bilangan bulat.',
-    'number.positive': 'Report ID harus bernilai positif.',
-    'any.required': 'Report ID wajib diisi.',
-  }),
-  verificationStatus: joi.string().valid('PENDING', 'APPROVED', 'REJECTED').required().messages({
+  verificationStatus: joi.string().valid('PENDING', 'VERIFIED', 'REJECTED').required().messages({
     'string.base': 'Status verifikasi harus berupa teks.',
-    'any.only': 'Status verifikasi harus salah satu dari: PENDING, APPROVED, REJECTED.',
+    'any.only': 'Status verifikasi harus salah satu dari: PENDING, VERIFIED, REJECTED.',
     'any.required': 'Status verifikasi wajib diisi.',
   }),
   verificationNotes: joi.string().allow('').optional().messages({
@@ -58,13 +66,6 @@ const verifyReportModel = joi.object({
 })
 
 const createReportProgressSchema = joi.object({
-  report_id: joi.number().integer().positive().required().messages({
-    'number.base': 'Report ID harus berupa angka',
-    'number.integer': 'Report ID harus berupa bilangan bulat',
-    'number.positive': 'Report ID harus bernilai positif',
-    'any.required': 'Report ID wajib diisi',
-  }),
-
   progressNotes: joi.string().min(10).required().messages({
     'string.base': 'Progress Notes harus berupa teks',
     'string.min': 'Progress Notes minimal harus 10 karakter',

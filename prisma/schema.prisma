@@ -3,7 +3,6 @@
 generator client {
   provider        = "prisma-client-js"
   output          = "../generated/prisma"
-  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
@@ -30,17 +29,17 @@ enum ProgressStage {
 }
 
 model User {
-  user_id     Int      @id @default(autoincrement())
-  email       String   @unique
-  password    String
-  firstName   String
-  lastName    String?
-  username    String   @unique
-  phoneNumber String?
-  role        Role     @default(USER)
-  signature   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user_id      Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  firstname    String
+  lastname     String?
+  username     String   @unique
+  phone_number String
+  role         Role     @default(USER)
+  signature    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   address         Address?
   reports         Report[]         @relation("UserReports")
@@ -51,14 +50,14 @@ model User {
 }
 
 model Report {
-  report_id          Int                @id @default(autoincrement())
-  title              String
-  description        String             @db.Text
-  photoUrl           String
-  verificationStatus VerificationStatus @default(PENDING)
-  verificationNotes  String?            @db.Text
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  report_id           Int                @id @default(autoincrement())
+  title               String
+  description         String             @db.Text
+  photoUrl            String
+  verification_status VerificationStatus @default(PENDING)
+  verification_notes  String?            @db.Text
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   address Address?
 
@@ -77,8 +76,8 @@ model Report {
 model Address {
   address_id Int      @id @default(autoincrement())
   street     String   @db.Text
-  latitude   Float
-  longitude  Float
+  latitude   Float?
+  longitude  Float?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -98,8 +97,8 @@ model Address {
 
 model ReportProgress {
   report_progress_id Int           @id @default(autoincrement())
-  photoUrl           String
-  progressNotes      String        @db.Text
+  photo_url          String
+  progress_notes     String        @db.Text
   stage              ProgressStage @default(REVIEW)
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt

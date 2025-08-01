@@ -6,6 +6,7 @@ export const config = {
   port: process.env.EXPRESS_PORT,
   publicKey: process.env.PUBLIC_KEY_PATH,
   privateKey: process.env.PRIVATE_KEY_PATH,
+  jwtSecretKey: process.env.JWT_SECRET_KEY,
   mysqlConfig: {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,

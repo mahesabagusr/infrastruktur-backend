@@ -9,7 +9,7 @@ import uploadToCloudinary from "@/module/utils/image-upload.js";
 export default class ReportService {
   static async addReport(payload) {
     try {
-      console.log(payload)
+
       const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
 
       const author = await prisma.user.findFirst({
@@ -34,11 +34,13 @@ export default class ReportService {
           title,
           description,
           address: {
-            street,
-            longitude,
-            latitude,
-            province_id: provinceId,
-            regency_id: regencyId,
+            create: {
+              street,
+              longitude,
+              latitude,
+              province_id: provinceId,
+              regency_id: regencyId,
+            }
           },
           author_id: author.user_id,
           photoUrl: imageUrl,
@@ -58,15 +60,15 @@ export default class ReportService {
 
   static async verifyReport(payload) {
     try {
-      const { reportId, verificationStatus, verificationNotes } = payload;
+      const { reportId, verificationStatus: verification_status, verificationNotes: verification_notes } = payload;
 
       const updatedReport = await prisma.report.update({
         where: {
-          report_id: reportId,
+          report_id: parseInt(reportId),
         },
         data: {
-          verificationStatus,
-          verificationNotes,
+          verification_status,
+          verification_notes,
         }
       });
 
@@ -83,7 +85,7 @@ export default class ReportService {
 
   static async addReportProgress(payload) {
     try {
-      const { progressNotes, stage, email, image, reportId, } = payload
+      const { progressNotes: progress_notes, stage, email, image, reportId, } = payload
 
       const author = await prisma.user.findFirst({
         where: {
@@ -108,11 +110,11 @@ export default class ReportService {
 
       const newReportProgress = await prisma.reportProgress.create({
         data: {
-          progressNotes,
+          progress_notes,
           stage,
-          author_id: author.user_id,
-          report_id: reportId,
-          photoUrl: imageUrl,
+          reviewer_id: author.user_id,
+          report_id: parseInt(reportId),
+          photo_url: imageUrl,
         }
       })
 
@@ -135,6 +137,8 @@ export default class ReportService {
           report_id: true,
           title: true,
           description: true,
+          verification_status: true,
+          verification_notes: true,
           address: {
             select: {
               street: true,
@@ -163,7 +167,7 @@ export default class ReportService {
       const reports = await prisma.report.findMany({
         where: {
           address: {
-            province_id: province,
+            province_id: parseInt(province),
           }
         },
         select: {

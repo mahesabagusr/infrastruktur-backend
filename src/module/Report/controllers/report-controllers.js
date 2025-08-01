@@ -76,7 +76,7 @@ const addReport = async (req, res) => {
 const verifyReport = async (req, res) => {
   try {
 
-    const validatePayload = isValidPayload(payload, verifyReportModel);
+    const validatePayload = isValidPayload(req.body, verifyReportModel);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -94,7 +94,7 @@ const verifyReport = async (req, res) => {
       return await ReportService.verifyReport(data);
     }
 
-    const result = await postRequest(validatePayload.data);
+    const result = await postRequest(payload);
 
     if (result.err) {
       return wrapper.response(
@@ -113,6 +113,7 @@ const verifyReport = async (req, res) => {
         http.OK
       );
     }
+
   } catch (err) {
     logger.error(`Unexpected error during verifyReport: ${err.message}`);
 
@@ -192,7 +193,7 @@ const addReportProgress = async (req, res) => {
 
 const getAllReport = async (req, res) => {
   try {
-    const reports = await ReportService.getAllReports();
+    const reports = await ReportService.getAllReport();
 
     if (reports.err) {
       return wrapper.response(
@@ -227,9 +228,9 @@ const getAllReport = async (req, res) => {
 
 const getAllReportsByProvince = async (req, res) => {
   try {
-    const { province } = req.params;
+    const { provinceId } = req.params;
 
-    const reports = await ReportService.getAllReportsByProvince(province);
+    const reports = await ReportService.getAllReportsByProvince(provinceId);
 
     if (reports.err) {
       return wrapper.response(
