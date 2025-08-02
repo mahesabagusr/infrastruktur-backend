@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `User` (
+CREATE TABLE `user` (
     `user_id` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
@@ -12,14 +12,14 @@ CREATE TABLE `User` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `User_email_key`(`email`),
-    UNIQUE INDEX `User_username_key`(`username`),
-    INDEX `User_email_idx`(`email`),
+    UNIQUE INDEX `user_email_key`(`email`),
+    UNIQUE INDEX `user_username_key`(`username`),
+    INDEX `user_email_idx`(`email`),
     PRIMARY KEY (`user_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Report` (
+CREATE TABLE `report` (
     `report_id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NOT NULL,
     `description` TEXT NOT NULL,
@@ -31,13 +31,13 @@ CREATE TABLE `Report` (
     `author_id` INTEGER NOT NULL,
     `verifier_id` INTEGER NULL,
 
-    INDEX `Report_author_id_idx`(`author_id`),
-    INDEX `Report_verifier_id_idx`(`verifier_id`),
+    INDEX `report_author_id_idx`(`author_id`),
+    INDEX `report_verifier_id_idx`(`verifier_id`),
     PRIMARY KEY (`report_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Address` (
+CREATE TABLE `address` (
     `address_id` INTEGER NOT NULL AUTO_INCREMENT,
     `street` TEXT NOT NULL,
     `latitude` DOUBLE NULL,
@@ -49,15 +49,15 @@ CREATE TABLE `Address` (
     `user_id` INTEGER NULL,
     `report_id` INTEGER NULL,
 
-    UNIQUE INDEX `Address_user_id_key`(`user_id`),
-    UNIQUE INDEX `Address_report_id_key`(`report_id`),
-    INDEX `Address_province_id_idx`(`province_id`),
-    INDEX `Address_regency_id_idx`(`regency_id`),
+    UNIQUE INDEX `address_user_id_key`(`user_id`),
+    UNIQUE INDEX `address_report_id_key`(`report_id`),
+    INDEX `address_province_id_idx`(`province_id`),
+    INDEX `address_regency_id_idx`(`regency_id`),
     PRIMARY KEY (`address_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `ReportProgress` (
+CREATE TABLE `report_progress` (
     `report_progress_id` INTEGER NOT NULL AUTO_INCREMENT,
     `photo_url` VARCHAR(191) NOT NULL,
     `progress_notes` TEXT NOT NULL,
@@ -67,53 +67,53 @@ CREATE TABLE `ReportProgress` (
     `reviewer_id` INTEGER NOT NULL,
     `report_id` INTEGER NOT NULL,
 
-    INDEX `ReportProgress_reviewer_id_idx`(`reviewer_id`),
-    INDEX `ReportProgress_report_id_idx`(`report_id`),
+    INDEX `report_progress_reviewer_id_idx`(`reviewer_id`),
+    INDEX `report_progress_report_id_idx`(`report_id`),
     PRIMARY KEY (`report_progress_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Provinces` (
+CREATE TABLE `province` (
     `province_id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `Provinces_name_key`(`name`),
+    UNIQUE INDEX `province_name_key`(`name`),
     PRIMARY KEY (`province_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Regencies` (
+CREATE TABLE `regency` (
     `regency_id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
     `province_id` INTEGER NOT NULL,
 
-    INDEX `Regencies_province_id_idx`(`province_id`),
+    INDEX `regency_province_id_idx`(`province_id`),
     PRIMARY KEY (`regency_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Report` ADD CONSTRAINT `Report_author_id_fkey` FOREIGN KEY (`author_id`) REFERENCES `User`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `report` ADD CONSTRAINT `report_author_id_fkey` FOREIGN KEY (`author_id`) REFERENCES `user`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Report` ADD CONSTRAINT `Report_verifier_id_fkey` FOREIGN KEY (`verifier_id`) REFERENCES `User`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `report` ADD CONSTRAINT `report_verifier_id_fkey` FOREIGN KEY (`verifier_id`) REFERENCES `user`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Address` ADD CONSTRAINT `Address_province_id_fkey` FOREIGN KEY (`province_id`) REFERENCES `Provinces`(`province_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `address` ADD CONSTRAINT `address_province_id_fkey` FOREIGN KEY (`province_id`) REFERENCES `province`(`province_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Address` ADD CONSTRAINT `Address_regency_id_fkey` FOREIGN KEY (`regency_id`) REFERENCES `Regencies`(`regency_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `address` ADD CONSTRAINT `address_regency_id_fkey` FOREIGN KEY (`regency_id`) REFERENCES `regency`(`regency_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Address` ADD CONSTRAINT `Address_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `address` ADD CONSTRAINT `address_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Address` ADD CONSTRAINT `Address_report_id_fkey` FOREIGN KEY (`report_id`) REFERENCES `Report`(`report_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `address` ADD CONSTRAINT `address_report_id_fkey` FOREIGN KEY (`report_id`) REFERENCES `report`(`report_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ReportProgress` ADD CONSTRAINT `ReportProgress_reviewer_id_fkey` FOREIGN KEY (`reviewer_id`) REFERENCES `User`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `report_progress` ADD CONSTRAINT `report_progress_reviewer_id_fkey` FOREIGN KEY (`reviewer_id`) REFERENCES `user`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ReportProgress` ADD CONSTRAINT `ReportProgress_report_id_fkey` FOREIGN KEY (`report_id`) REFERENCES `Report`(`report_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `report_progress` ADD CONSTRAINT `report_progress_report_id_fkey` FOREIGN KEY (`report_id`) REFERENCES `report`(`report_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Regencies` ADD CONSTRAINT `Regencies_province_id_fkey` FOREIGN KEY (`province_id`) REFERENCES `Provinces`(`province_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `regency` ADD CONSTRAINT `regency_province_id_fkey` FOREIGN KEY (`province_id`) REFERENCES `province`(`province_id`) ON DELETE CASCADE ON UPDATE CASCADE;

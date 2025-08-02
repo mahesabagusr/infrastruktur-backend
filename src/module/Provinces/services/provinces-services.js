@@ -7,7 +7,7 @@ import { prisma } from "@/helpers/db/prisma.js";
 export default class ProvinceService {
   static async getAllProvinces() {
     try {
-      const provinces = await prisma.provinces.findMany({
+      const provinces = await prisma.province.findMany({
       });
 
       if (!provinces || provinces.length === 0) {
@@ -22,7 +22,7 @@ export default class ProvinceService {
 
   static async getAllRegencies() {
     try {
-      const regencies = await prisma.regencies.findMany({
+      const regencies = await prisma.regency.findMany({
         include: {
           province: {
             select: {
@@ -44,7 +44,7 @@ export default class ProvinceService {
 
   static async getRegenciesByProvinceId(provinceId) {
     try {
-      const regencies = await prisma.regencies.findMany({
+      const regencies = await prisma.regency.findMany({
         where: {
           province_id: parseInt(provinceId),
         },
@@ -60,7 +60,7 @@ export default class ProvinceService {
       if (!regencies || regencies.length === 0) {
         return wrapper.error(new BadRequestError("No regencies found for this province."));
       }
-      
+
       return wrapper.data(regencies);
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
