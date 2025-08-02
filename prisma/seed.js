@@ -4,9 +4,9 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Menghapus data lama...');
-
-  await prisma.regencies.deleteMany();
   await prisma.provinces.deleteMany();
+  await prisma.regencies.deleteMany();
+
   console.log('Data lama berhasil dihapus.');
 
   console.log('Menambahkan data provinsi...');
