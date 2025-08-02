@@ -52,7 +52,6 @@ jobs:
         with:
           name: node-app
 
-      # -- LANGKAH YANG PERLU DITAMBAHKAN --
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
@@ -60,7 +59,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      # ------------------------------------
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -70,7 +68,9 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_39AC9D3530F34F8B9F1780D2039379EB }}
 
       - name: Run Prisma migration
-        run: npx prisma migrate deploy
+        run: |
+          npx prisma migrate reset
+          npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
