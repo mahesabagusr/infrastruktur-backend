@@ -9,6 +9,7 @@ const privateKey = config.jwtPrivateKey;
 const publicKey = config.jwtPublicKey;
 
 export const createToken = (data) => {
+  console.log(privateKey, publicKey);
   const accessToken = jwt.sign(
     { name: data.name, email: data.email, signature: data.signature, role: data.role },
     privateKey,
