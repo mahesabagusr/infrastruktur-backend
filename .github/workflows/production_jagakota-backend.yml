@@ -69,9 +69,14 @@ jobs:
 
       - name: Run Prisma migration
         run: |
+          npx prisma migrate reset --force
           npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run Prisma Seed
+        run: |
+          node --no-warnings --loader=./custom-loader.mjs prisma/seed.js
 
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
