@@ -75,7 +75,7 @@ jobs:
 
       - name: Run Prisma Seed
         run: |
-          node --no-warnings --loader=./custom-loader.mjs prisma/seed.js
+          npx prisma db seed
 
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
