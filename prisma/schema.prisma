@@ -81,14 +81,14 @@ model Address {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  province    Provinces @relation(fields: [province_id], references: [province_id])
+  province    Provinces @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
   province_id Int
-  regency     Regencies @relation(fields: [regency_id], references: [regency_id])
+  regency     Regencies @relation(fields: [regency_id], references: [regency_id], onDelete: Cascade)
   regency_id  Int
 
-  user      User?   @relation(fields: [user_id], references: [user_id])
+  user      User?   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   user_id   Int?    @unique
-  report    Report? @relation(fields: [report_id], references: [report_id])
+  report    Report? @relation(fields: [report_id], references: [report_id], onDelete: Cascade)
   report_id Int?    @unique
 
   @@index([province_id])
@@ -125,7 +125,7 @@ model Regencies {
   regency_id Int    @id @default(autoincrement())
   name       String
 
-  province    Provinces @relation(fields: [province_id], references: [province_id])
+  province    Provinces @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
   province_id Int
 
   addresses Address[]
