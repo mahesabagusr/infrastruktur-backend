@@ -69,7 +69,6 @@ jobs:
 
       - name: Run Prisma migration
         run: |
-          npx prisma migrate reset
           npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
