@@ -5,8 +5,8 @@ import { config } from '@/helpers/infra/global_config.js'
 import * as wrapper from '@/helpers/utils/wrapper.js'
 import Unauthorized from '@/helpers/error/unauthorized_error.js';
 
-const privateKey = config.jwtPrivateKey;
-const publicKey = config.jwtPublicKey;
+const privateKey = config.jwtPrivateKey.replace(/\\n/g, '\n');
+const publicKey = config.jwtPublicKey.replace(/\\n/g, '\n');
 
 export const createToken = (data) => {
   console.log(privateKey, publicKey);
@@ -31,28 +31,41 @@ export const createRefreshToken = (data) => {
 
 export const verifyToken = async (req, res, next) => {
   try {
-    const { authorization } = req.headers
-    const token = authorization && authorization.split(' ')[1];
+    const { authorization } = req.headers;
 
-    if (!token) {
-      return wrapper.response(res, "fail", { err: new Unauthorized('Token is required') }, "Unauthorized", httpError.UNAUTHORIZED);
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      const err = new Unauthorized('Token is required and must be in Bearer format');
+      return wrapper.response(res, "fail", { err }, "Unauthorized", httpError.UNAUTHORIZED);
     }
 
+    const token = authorization.split(' ')[1];
+
     jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (err, decoded) => {
-      if (err instanceof jwt.JsonWebTokenError) {
-        return wrapper.response(res, "fail", { err: new Unauthorized('Invalid Token', err) }, "Unauthorized", httpError.UNAUTHORIZED);
+      if (err) {
+        let unauthorizedError;
+        if (err instanceof jwt.TokenExpiredError) {
+          unauthorizedError = new Unauthorized('Token has expired', err);
+        } else if (err instanceof jwt.JsonWebTokenError) {
+          unauthorizedError = new Unauthorized('Invalid Token', err);
+        } else {
+          unauthorizedError = new Unauthorized('Token verification failed', err);
+        }
+        return wrapper.response(res, "fail", { err: unauthorizedError }, "Unauthorized", httpError.UNAUTHORIZED);
       }
 
-      if (err instanceof jwt.TokenExpiredError) {
-        return wrapper.response(res, "fail", { err: new Unauthorized('Token has expired') }, "Unauthorized", httpError.UNAUTHORIZED);
-      }
+      req.user = {
+        name: decoded.name,
+        email: decoded.email,
+        signature: decoded.signature,
+        role: decoded.role
+      };
 
-      let { name, email, signature, role } = decoded;
-      Object.assign(req, { name, email, signature, role });
       next();
-    })
+    });
 
   } catch (err) {
-    return wrapper.response(res, "fail", { err: new Unauthorized(err.message) }, "Unauthorized", httpError.UNAUTHORIZED);
+    // This catch block will handle unexpected errors during the process.
+    const unauthorizedError = new Unauthorized(err.message);
+    return wrapper.response(res, "fail", { err: unauthorizedError }, "Unauthorized", httpError.UNAUTHORIZED);
   }
-}
+};
