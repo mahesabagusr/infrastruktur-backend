@@ -28,7 +28,7 @@ enum ProgressStage {
   COMPLETED
 }
 
-model User {
+model user {
   user_id      Int      @id @default(autoincrement())
   email        String   @unique
   password     String
@@ -41,15 +41,15 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  address         Address?
-  reports         Report[]         @relation("UserReports")
-  verifiedReports Report[]         @relation("VerifierReports")
-  reviews         ReportProgress[]
+  address         address?
+  reports         report[]          @relation("UserReports")
+  verifiedReports report[]          @relation("VerifierReports")
+  reviews         report_progress[]
 
   @@index([email])
 }
 
-model Report {
+model report {
   report_id           Int                @id @default(autoincrement())
   title               String
   description         String             @db.Text
@@ -59,21 +59,21 @@ model Report {
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
-  address Address?
+  address address?
 
-  author    User @relation("UserReports", fields: [author_id], references: [user_id])
+  author    user @relation("UserReports", fields: [author_id], references: [user_id])
   author_id Int
 
-  verifier    User? @relation("VerifierReports", fields: [verifier_id], references: [user_id])
+  verifier    user? @relation("VerifierReports", fields: [verifier_id], references: [user_id])
   verifier_id Int?
 
-  progressUpdates ReportProgress[]
+  progressUpdates report_progress[]
 
   @@index([author_id])
   @@index([verifier_id])
 }
 
-model Address {
+model address {
   address_id Int      @id @default(autoincrement())
   street     String   @db.Text
   latitude   Float?
@@ -81,21 +81,21 @@ model Address {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  province    Provinces @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
+  province    province @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
   province_id Int
-  regency     Regencies @relation(fields: [regency_id], references: [regency_id], onDelete: Cascade)
+  regency     regency  @relation(fields: [regency_id], references: [regency_id], onDelete: Cascade)
   regency_id  Int
 
-  user      User?   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  user      user?   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   user_id   Int?    @unique
-  report    Report? @relation(fields: [report_id], references: [report_id], onDelete: Cascade)
+  report    report? @relation(fields: [report_id], references: [report_id], onDelete: Cascade)
   report_id Int?    @unique
 
   @@index([province_id])
   @@index([regency_id])
 }
 
-model ReportProgress {
+model report_progress {
   report_progress_id Int           @id @default(autoincrement())
   photo_url          String
   progress_notes     String        @db.Text
@@ -103,32 +103,32 @@ model ReportProgress {
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
-  reviewer    User @relation(fields: [reviewer_id], references: [user_id])
+  reviewer    user @relation(fields: [reviewer_id], references: [user_id])
   reviewer_id Int
 
-  report    Report @relation(fields: [report_id], references: [report_id])
+  report    report @relation(fields: [report_id], references: [report_id], onDelete: Cascade)
   report_id Int
 
   @@index([reviewer_id])
   @@index([report_id])
 }
 
-model Provinces {
+model province {
   province_id Int    @id @default(autoincrement())
   name        String @unique
 
-  regencies Regencies[]
-  addresses Address[]
+  regencies regency[]
+  addresses address[]
 }
 
-model Regencies {
+model regency {
   regency_id Int    @id @default(autoincrement())
   name       String
 
-  province    Provinces @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
+  province    province @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
   province_id Int
 
-  addresses Address[]
+  addresses address[]
 
   @@index([province_id])
 }

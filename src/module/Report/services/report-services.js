@@ -108,7 +108,7 @@ export default class ReportService {
 
       const imageUrl = uploadResult.secure_url;
 
-      const newReportProgress = await prisma.reportProgress.create({
+      const newReportProgress = await prisma.report_progress.create({
         data: {
           progress_notes,
           stage,
