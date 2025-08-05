@@ -75,7 +75,6 @@ const addReport = async (req, res) => {
 
 const verifyReport = async (req, res) => {
   try {
-
     const validatePayload = isValidPayload(req.body, verifyReportModel);
 
     if (validatePayload.err) {

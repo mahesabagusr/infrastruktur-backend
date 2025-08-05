@@ -45,6 +45,7 @@ model user {
   reports         report[]          @relation("UserReports")
   verifiedReports report[]          @relation("VerifierReports")
   reviews         report_progress[]
+  articles        article[]
 
   @@index([email])
 }
@@ -131,4 +132,15 @@ model regency {
   addresses address[]
 
   @@index([province_id])
+}
+
+model article {
+  article_id Int @id @default(autoincrement())
+  title      String
+  content    String @db.Text
+  author_id  Int
+  author     user @relation(fields: [author_id], references: [user_id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
 }
