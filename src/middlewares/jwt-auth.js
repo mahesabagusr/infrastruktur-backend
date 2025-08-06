@@ -9,9 +9,9 @@ const privateKey = config.jwtPrivateKey.replace(/\\n/g, '\n');
 const publicKey = config.jwtPublicKey.replace(/\\n/g, '\n');
 
 export const createToken = (data) => {
-  console.log(privateKey, publicKey);
+  console.log(data)
   const accessToken = jwt.sign(
-    { name: data.name, email: data.email, signature: data.signature, role: data.role },
+    { username: data.username, email: data.email, signature: data.signature, role: data.role },
     privateKey,
     { algorithm: 'RS256', expiresIn: '15m' }
   );
