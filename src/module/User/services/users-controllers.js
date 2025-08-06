@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import * as wrapper from "@/helpers/utils/wrapper.js";
-import { createToken } from "@/middlewares/jwt-auth.js";
+import { createRefreshToken, createToken, verifyRefreshToken } from "@/middlewares/jwt-auth.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -85,11 +85,52 @@ export default class UserService {
       }
 
       const { accessToken } = await createToken(user);
+      const { refreshToken } = createRefreshToken(user);
 
-      return wrapper.data({ token: accessToken });
+      await prisma.refresh_token.create({
+        data: {
+          token: refreshToken,
+          userId: user.user_id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        },
+      })
+
+      return wrapper.data({ token: accessToken, refreshToken });
 
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
+    }
+  }
+
+  static async refreshToken(token) {
+    try {
+      const { decoded, error } = verifyRefreshToken(token)
+
+      if (error) {
+        return wrapper.error(new UnauthorizedError("Invalid refresh token."));
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          username: decoded.username,
+          refresh_token: {
+            some: {
+              token: token
+            }
+          }
+        }
+      })
+
+      if (!user) {
+        return wrapper.error(new NotFoundError("Token is valid, but no longer active for this user. Please log in again."));
+      }
+
+      const { accessToken } = createToken(user);
+
+      return wrapper.data({ accessToken })
+
+    } catch (err) {
+      return wrapper.error(new UnauthorizedError("Refresh token verification failed : " + err.message));
     }
   }
 }

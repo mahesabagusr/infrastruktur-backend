@@ -13,7 +13,7 @@ export const createToken = (data) => {
   const accessToken = jwt.sign(
     { name: data.name, email: data.email, signature: data.signature, role: data.role },
     privateKey,
-    { algorithm: 'RS256', expiresIn: '1d' }
+    { algorithm: 'RS256', expiresIn: '15m' }
   );
 
   return { accessToken };
@@ -23,10 +23,20 @@ export const createRefreshToken = (data) => {
   const refreshToken = jwt.sign(
     { username: data.username, email: data.email, signature: data.signature, role: data.role },
     privateKey,
-    { algorithm: 'RS256', expiresIn: '1w' }
+    { algorithm: 'RS256', expiresIn: '7d' }
   );
 
   return { refreshToken };
+}
+
+
+export const verifyRefreshToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
+    return { decoded, error: null };
+  } catch (err) {
+    return { decoded: null, error: err };
+  }
 }
 
 export const verifyToken = async (req, res, next) => {
@@ -64,7 +74,6 @@ export const verifyToken = async (req, res, next) => {
     });
 
   } catch (err) {
-    // This catch block will handle unexpected errors during the process.
     const unauthorizedError = new Unauthorized(err.message);
     return wrapper.response(res, "fail", { err: unauthorizedError }, "Unauthorized", httpError.UNAUTHORIZED);
   }

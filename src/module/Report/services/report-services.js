@@ -21,6 +21,10 @@ export default class ReportService {
         },
       })
 
+      if (!author) {
+        return wrapper.error(new BadRequestError("User tidak ditemukan"));
+      }
+
       const uploadResult = await uploadToCloudinary(image);
 
       if (!uploadResult) {
@@ -131,7 +135,6 @@ export default class ReportService {
 
   static getAllReport = async () => {
     try {
-
       const reports = await prisma.report.findMany({
         select: {
           report_id: true,
