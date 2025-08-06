@@ -1,5 +1,5 @@
 import express from 'express';
-import { userRegister, userLogin } from '@/module/User/controllers/users-controllers.js';
+import { userRegister, userLogin, refreshToken } from '@/module/User/controllers/users-controllers.js';
 import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/module/Provinces/controllers/provinces-controllers.js';
 import { addReport, addReportProgress, getAllReport, getAllReportsByProvince, verifyReport } from '@/module/Report/controllers/report-controllers.js';
 import { verifyToken } from '@/middlewares/jwt-auth.js';
@@ -14,6 +14,7 @@ router.get('/', function (req, res) {
 
 router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
+router.post('/user/refreshToken', refreshToken)
 
 router.get('/provinces', getAllProvinces);
 router.get('/regencies', getAllRegencies);
