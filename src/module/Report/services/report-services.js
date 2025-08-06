@@ -21,6 +21,10 @@ export default class ReportService {
         },
       })
 
+      if (!author) {
+        return wrapper.error(new BadRequestError("User tidak ditemukan"));
+      }
+
       const uploadResult = await uploadToCloudinary(image);
 
       if (!uploadResult) {
@@ -131,7 +135,6 @@ export default class ReportService {
 
   static getAllReport = async () => {
     try {
-
       const reports = await prisma.report.findMany({
         select: {
           report_id: true,
@@ -191,6 +194,43 @@ export default class ReportService {
       }
 
       return wrapper.data(reports);
+
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
+
+  static getReportById = async (reportId) => {
+    try {
+
+      const report = await prisma.report.findUnique({
+        where: {
+          report_id: parseInt(reportId),
+        },
+        select: {
+          report_id: true,
+          title: true,
+          description: true,
+          verification_status: true,
+          verification_notes: true,
+          address: {
+            select: {
+              street: true,
+              latitude: true,
+              longitude: true,
+              province_id: true,
+              regency_id: true,
+            }
+          },
+          photoUrl: true,
+        }
+      })
+
+      if (!report) {
+        return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
+      }
+
+      return wrapper.data(report);
 
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));

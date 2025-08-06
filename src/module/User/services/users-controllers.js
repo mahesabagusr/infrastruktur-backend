@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import * as wrapper from "@/helpers/utils/wrapper.js";
-import { createToken } from "@/middlewares/jwt-auth.js";
+import { createRefreshToken, createToken, verifyRefreshToken } from "@/middlewares/jwt-auth.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -84,11 +84,75 @@ export default class UserService {
         return wrapper.error(new UnauthorizedError("Incorrect password."));
       }
 
-      const { accessToken } = await createToken(user);
+      const { accessToken } = createToken(user);
+      const { refreshToken } = createRefreshToken(user);
 
-      return wrapper.data({ token: accessToken });
+      await prisma.refresh_token.create({
+        data: {
+          token: refreshToken,
+          user_id: user.user_id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        },
+      })
+
+      return wrapper.data({ token: accessToken, refreshToken });
 
     } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
+
+  static async refreshToken(token) {
+    try {
+      const { error } = verifyRefreshToken(token)
+
+      if (error) {
+        return wrapper.error(new UnauthorizedError("Invalid refresh token."));
+      }
+
+      const activeToken = await prisma.refresh_token.findFirst({
+        where: { token: token },
+        include: { user: true }
+      });
+
+      if (!activeToken) {
+        return wrapper.error(new NotFoundError("Token is valid, but no longer active. Please log in again."));
+      }
+
+      await prisma.refresh_token.delete({
+        where: { id: activeToken.id }
+      });
+
+      const { accessToken } = createToken(activeToken.user)
+      const { refreshToken } = createRefreshToken(activeToken.user)
+
+      await prisma.refresh_token.create({
+        data: {
+          token: refreshToken,
+          user_id: activeToken.user.user_id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        }
+      });
+
+      return wrapper.data({ token: accessToken, refreshToken })
+
+    } catch (err) {
+      return wrapper.error(new UnauthorizedError("Refresh token verification failed : " + err.message));
+    }
+  }
+
+  static async logout(token) {
+    try {
+      await prisma.refresh_token.deleteMany({
+        where: {
+          token: token,
+        },
+      });
+
+      return wrapper.data("Logout successful.");
+
+    } catch (err) {
+
       return wrapper.error(new BadRequestError(err.message));
     }
   }

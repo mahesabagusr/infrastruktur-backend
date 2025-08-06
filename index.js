@@ -1,6 +1,7 @@
 import express from 'express';
 import router from '@/routes/routes.js';
 import swaggerUi from 'swagger-ui-express';
+import cookieParser from 'cookie-parser';
 import { config } from '@/helpers/infra/global_config.js';
 
 import fs from 'fs';
@@ -17,6 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(router);
 

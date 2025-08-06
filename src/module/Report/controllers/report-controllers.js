@@ -75,7 +75,6 @@ const addReport = async (req, res) => {
 
 const verifyReport = async (req, res) => {
   try {
-
     const validatePayload = isValidPayload(req.body, verifyReportModel);
 
     if (validatePayload.err) {
@@ -263,4 +262,39 @@ const getAllReportsByProvince = async (req, res) => {
   }
 }
 
-export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince };
+const getReportById = async (req, res) => {
+  try {
+    const { reportId } = req.params;
+
+    const report = await ReportService.getReportById(reportId);
+
+    if (report.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        report,
+        "Gagal mendapatkan laporan",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      report,
+      "Berhasil mendapatkan laporan",
+      http.OK
+    );
+
+  } catch (err) {
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
+export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById };
