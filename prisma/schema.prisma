@@ -46,8 +46,20 @@ model user {
   verifiedReports report[]          @relation("VerifierReports")
   reviews         report_progress[]
   articles        article[]
+  refreshTokens   refresh_token[]
 
   @@index([email])
+}
+
+model refresh_token {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      user     @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model report {
@@ -135,12 +147,11 @@ model regency {
 }
 
 model article {
-  article_id Int @id @default(autoincrement())
+  article_id Int      @id @default(autoincrement())
   title      String
-  content    String @db.Text
+  content    String   @db.Text
   author_id  Int
-  author     user @relation(fields: [author_id], references: [user_id], onDelete: Cascade)
+  author     user     @relation(fields: [author_id], references: [user_id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
 }
