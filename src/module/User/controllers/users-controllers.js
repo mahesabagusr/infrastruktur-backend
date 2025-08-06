@@ -7,7 +7,7 @@ import UserService from '@/module/User/services/users-controllers.js';
 import { isValidPayload } from '@/helpers/utils/validator.js';
 import { registerModel, loginModel } from '@/module/User/models/users-model.js';
 import logger from '@/helpers/utils/logger.js';
-import Unauthorized from '@/helpers/error/unauthorized_error';
+import Unauthorized from '@/helpers/error/unauthorized_error.js';
 
 const userRegister = async (req, res) => {
   try {
@@ -105,7 +105,7 @@ const userLogin = async (req, res) => {
     return wrapper.response(
       res,
       "success",
-      { accessToken: result.data.accessToken },
+      { data: { token: result.data.token } },
       "User Login Successful",
       http.OK
     );
@@ -133,6 +133,7 @@ const refreshToken = async (req, res) => {
     const result = await UserService.refreshToken(currentRefreshToken);
 
     if (result.err) {
+      console.log(result.err)
       return wrapper.response(
         res,
         "fail",
@@ -142,15 +143,21 @@ const refreshToken = async (req, res) => {
       );
     }
 
-    return wrapper.response(res, "success", result.data, "Token refreshed successfully", http.OK);
+    res.cookie('refreshToken', result.data.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    return wrapper.response(res, "success", { data: { accessToken: result.data.accessToken } }, "Token refreshed successfully", http.OK);
 
   } catch (err) {
     logger.error(`Unexpected error during refresh token: ${err.message}`);
-
+    console.log(err.message)
     return wrapper.response(
       res,
       "fail",
-      { err: err.message, data: null },
+      { err: err, data: null },
       "An unexpected error occurred",
       httpError.INTERNAL_ERROR
     );
@@ -160,14 +167,13 @@ const refreshToken = async (req, res) => {
 const userLogout = async (req, res) => {
   try {
     const currentRefreshToken = req.cookies.refreshToken
-
-    const result = await UserService.refreshToken(currentRefreshToken);
+    const result = await UserService.logout(currentRefreshToken);
 
     if (result.err) {
       return wrapper.response(
         res,
         "fail",
-        result.err,
+        result,
         "Failed to Logout",
         httpError.UNAUTHORIZED
       );
@@ -175,19 +181,18 @@ const userLogout = async (req, res) => {
 
     res.clearCookie('refreshToken')
 
-    return wrapper.response(res, "success", null, "Logged out successfully", http.OK);
+    return wrapper.response(res, "success", result, "Logged out successfully", http.OK);
 
   } catch (err) {
     logger.error(`Unexpected error during user logout: ${err.message}`);
     return wrapper.response(
       res,
       "fail",
-      { err: err.message },
+      { err: err, data: null },
       "An unexpected error occurred",
       httpError.INTERNAL_ERROR
     );
   }
-
 }
 
 export { userRegister, userLogin, refreshToken, userLogout };
