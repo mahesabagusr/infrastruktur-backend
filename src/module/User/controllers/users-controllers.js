@@ -157,4 +157,37 @@ const refreshToken = async (req, res) => {
   }
 }
 
-export { userRegister, userLogin, refreshToken };
+const userLogout = async (req, res) => {
+  try {
+    const currentRefreshToken = req.cookies.refreshToken
+
+    const result = await UserService.refreshToken(currentRefreshToken);
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result.err,
+        "Failed to Logout",
+        httpError.UNAUTHORIZED
+      );
+    }
+
+    res.clearCookie('refreshToken')
+
+    return wrapper.response(res, "success", null, "Logged out successfully", http.OK);
+
+  } catch (err) {
+    logger.error(`Unexpected error during user logout: ${err.message}`);
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+
+}
+
+export { userRegister, userLogin, refreshToken, userLogout };
