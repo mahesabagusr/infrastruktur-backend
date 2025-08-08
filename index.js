@@ -3,6 +3,7 @@ import router from '@/routes/routes.js';
 import swaggerUi from 'swagger-ui-express';
 import cookieParser from 'cookie-parser';
 import { config } from '@/helpers/infra/global_config.js';
+import cors from 'cors'
 
 import fs from 'fs';
 import YAML from 'js-yaml';
@@ -10,13 +11,16 @@ import YAML from 'js-yaml';
 const swaggerDocument = YAML.load(fs.readFileSync('./docs/docs.yaml', 'utf8'));
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  allowedHeaders: 'Content-Type,Authorization'
+}
+
+app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
