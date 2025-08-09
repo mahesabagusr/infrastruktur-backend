@@ -7,55 +7,30 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "@/helpers/error";
-import { prisma } from "@/helpers/db/prisma.js";
+import UserRepository from "@/module/User/repository/user-repository.js";
 
 export default class UserService {
   static async register(payload) {
     try {
       const { username, email, password, firstName, phoneNumber, lastName, street, provinceId, regencyId } = payload;
 
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { email: email },
-            { username: username },
-          ],
-        },
-      });
-
+      const existingUser = await UserRepository.findUserByEmailOrUsername(email);
       if (existingUser) {
         const message =
           existingUser.email === email
             ? "Email is already in use."
             : "Username is already taken.";
-
         return wrapper.error(new UnauthorizedError(message));
       }
 
       const signature = nanoid(4);
       const hashPassword = await bcrypt.hash(password, 10);
 
-      await prisma.user.create({
-        data: {
-          username,
-          firstname: firstName,
-          lastname: lastName,
-          email,
-          password: hashPassword,
-          signature: signature,
-          phone_number: phoneNumber,
-          address: {
-            create: {
-              street: street,
-              province_id: provinceId,
-              regency_id: regencyId,
-            }
-          }
-        },
+      await UserRepository.createUser({
+        username, email, hashPassword, firstName, lastName, signature, phoneNumber, street, provinceId, regencyId
       });
 
       return wrapper.data("User registered successfully.");
-
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }
@@ -65,21 +40,12 @@ export default class UserService {
     try {
       const { identifier, password } = payload;
 
-      const user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { username: identifier },
-            { email: identifier }
-          ],
-        },
-      });
-
+      const user = await UserRepository.findUserByEmailOrUsername(identifier);
       if (!user) {
         return wrapper.error(new NotFoundError("User not found."));
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
-
       if (!isPasswordValid) {
         return wrapper.error(new UnauthorizedError("Incorrect password."));
       }
@@ -87,16 +53,9 @@ export default class UserService {
       const { accessToken } = createToken(user);
       const { refreshToken } = createRefreshToken(user);
 
-      await prisma.refresh_token.create({
-        data: {
-          token: refreshToken,
-          user_id: user.user_id,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        },
-      })
+      await UserRepository.saveRefreshToken(refreshToken, user.user_id);
 
       return wrapper.data({ token: accessToken, refreshToken });
-
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }
@@ -104,38 +63,26 @@ export default class UserService {
 
   static async refreshToken(token) {
     try {
-      const { error } = verifyRefreshToken(token)
-
+      const { error } = verifyRefreshToken(token);
+      
       if (error) {
         return wrapper.error(new UnauthorizedError("Invalid refresh token."));
       }
 
-      const activeToken = await prisma.refresh_token.findFirst({
-        where: { token: token },
-        include: { user: true }
-      });
+      const activeToken = await UserRepository.findActiveRefreshToken(token);
 
       if (!activeToken) {
         return wrapper.error(new NotFoundError("Token is valid, but no longer active. Please log in again."));
       }
 
-      await prisma.refresh_token.delete({
-        where: { id: activeToken.id }
-      });
+      await UserRepository.deleteRefreshTokenById(activeToken.id);
 
-      const { accessToken } = createToken(activeToken.user)
-      const { refreshToken } = createRefreshToken(activeToken.user)
+      const { accessToken: newAccessToken } = createToken(activeToken.user);
+      const { refreshToken: newRefreshToken } = createRefreshToken(activeToken.user);
 
-      await prisma.refresh_token.create({
-        data: {
-          token: refreshToken,
-          user_id: activeToken.user.user_id,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        }
-      });
+      await UserRepository.saveRefreshToken(newRefreshToken, activeToken.user.user_id);
 
-      return wrapper.data({ token: accessToken, refreshToken })
-
+      return wrapper.data({ token: newAccessToken, refreshToken: newRefreshToken });
     } catch (err) {
       return wrapper.error(new UnauthorizedError("Refresh token verification failed : " + err.message));
     }
@@ -143,16 +90,9 @@ export default class UserService {
 
   static async logout(token) {
     try {
-      await prisma.refresh_token.deleteMany({
-        where: {
-          token: token,
-        },
-      });
-
+      await UserRepository.deleteRefreshTokenByToken(token);
       return wrapper.data("Logout successful.");
-
     } catch (err) {
-
       return wrapper.error(new BadRequestError(err.message));
     }
   }
