@@ -9,8 +9,9 @@ export default class ReportService {
   static async addReport(payload) {
     try {
       const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
-
+      console.log(email)
       const author = await UserRepository.findUserByEmailOrUsername(email);
+      console.log(author)
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
       }

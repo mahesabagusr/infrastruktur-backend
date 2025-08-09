@@ -32,7 +32,7 @@ const addReport = async (req, res) => {
       );
     }
 
-    const payload = { ...validatePayload.data, email: req.email, image: req.file.buffer };
+    const payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer };
 
     const postRequest = async (data) => {
       return await ReportService.addReport(data)
@@ -150,7 +150,7 @@ const addReportProgress = async (req, res) => {
 
     const { reportId } = req.params
 
-    const payload = { ...validatePayload.data, email: req.email, image: req.file.buffer, reportId };
+    const payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer, reportId };
 
     const postRequest = async (data) => {
       return await ReportService.addReportProgress(data)
