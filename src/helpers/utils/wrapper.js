@@ -15,13 +15,13 @@ import { ERROR as httpError } from '@/helpers/http-status/status_code.js';
 
 const response = (res, type, result, message = '', code = 200) => {
   let status = true;
-  let data = result.data;
+  let data = result && result.data !== undefined ? result.data : null;
 
 
   if (type === 'fail') {
     status = false;
     data = '';
-    message = result.err.message || message;
+    message = result.err && result.err.message ? result.err.message : message;
     code = checkErrorCode(result.err);
   }
 
@@ -55,15 +55,15 @@ const checkErrorCode = (error) => {
     case UnauthorizedError:
       return httpError.UNAUTHORIZED;
     default:
-      return httpError.INTERNAL_SERVER_ERROR; 
+      return httpError.INTERNAL_ERROR; 
   }
 };
 
-const data = (data) => ({ err: null, data }) 
+const data = (data) => ({ err: null, data });
 
 // const paginationData = (data, meta) => sendResponse(null, 'success', { data, meta });
 
-const error = (err) => ({ err, data: null })
+const error = (err) => ({ err, data: null });
 
 export {
   data,

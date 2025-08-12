@@ -278,4 +278,5 @@ const getReportById = async (req, res) => {
   }
 }
 
+
 export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById };

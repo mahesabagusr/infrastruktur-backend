@@ -386,5 +386,7 @@ export {
   verifyArticle,
   getAllArticle,
   getAllArticlesByCategory,
-  getArticleById
+  getArticleById,
+  updateArticle,
+  deleteArticle
 };
