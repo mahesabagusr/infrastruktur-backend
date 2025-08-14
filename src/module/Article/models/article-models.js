@@ -65,5 +65,5 @@ export {
   articleCreateModel, 
   articleUpdateModel, 
   articleQueryModel, 
-  articleParamsModel 
+  articleParamsModel,
 };
