@@ -1,6 +1,5 @@
 import Joi from "joi";
 
-// Joi validation schema for Article
 const articleCreateModel = Joi.object({
   title: Joi.string().min(3).max(255).required()
     .messages({
