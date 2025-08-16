@@ -118,12 +118,12 @@ export default class ReportRepository {
     });
   }
 
-  static async findReportsByProgress(stage){
+  static async findReportsByProgress(stage) {
     return prisma.report_progress.findMany({
       where: {
-        stage : stage,
+        stage: stage,
       },
-      select : {
+      select: {
         report_id: true,
         progress_notes: true,
         stage: true,

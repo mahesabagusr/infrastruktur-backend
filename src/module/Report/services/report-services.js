@@ -125,6 +125,7 @@ export default class ReportService {
 
   static getReportsByProgress = async (stage) => {
     try {
+      console.log("Tes")
       const reports = await ReportRepository.findReportsByProgress(stage);
       if (!reports || reports.length === 0) {
         return wrapper.error(new NotFoundError("Laporan tidak ditemukan untuk tahap ini"));
