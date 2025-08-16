@@ -105,7 +105,7 @@ const userLogin = async (req, res) => {
     return wrapper.response(
       res,
       "success",
-      { data: { token: result.data.token } },
+      { data: { token: result.data.token, username: result.data.username, role: result.data.role } },
       "User Login Successful",
       http.OK
     );
@@ -149,7 +149,13 @@ const refreshToken = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    return wrapper.response(res, "success", { data: { token: result.data.token } }, "Token refreshed successfully", http.OK);
+    return wrapper.response(
+      res,
+      "success",
+      { data: { token: result.data.token, username: result.data.username, role: result.data.role } },
+      "Token refreshed successfully",
+      http.OK
+    );
 
   } catch (err) {
     logger.error(`Unexpected error during refresh token: ${err.message}`);
