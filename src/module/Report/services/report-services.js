@@ -9,9 +9,7 @@ export default class ReportService {
   static async addReport(payload) {
     try {
       const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
-      console.log(email)
       const author = await UserRepository.findUserByEmailOrUsername(email);
-      console.log(author)
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
       }
@@ -87,13 +85,30 @@ export default class ReportService {
     }
   }
 
-  static getAllReport = async () => {
+  static getAllReport = async (query) => {
     try {
-      const reports = await ReportRepository.findAllReports();
-      if (!reports || reports.length === 0) {
-        return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
+      const { page = 1, limit = 10, stage } = query;
+      const offset = (page - 1) * limit;
+
+      let reports, total;
+      if (stage) {
+        reports = await ReportRepository.findReportsByProgress(stage, offset, limit);
+        console.log("Reports by stage:", reports);
+        total = await ReportRepository.countReportsByProgress(stage);
+        if (!reports || reports.length === 0) {
+          return wrapper.error(new NotFoundError("Laporan tidak ditemukan untuk tahap ini"));
+        }
+      } else {
+        reports = await ReportRepository.findAllReports(offset, limit);
+        total = await ReportRepository.countAllReports();
+        if (!reports || reports.length === 0) {
+          return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
+        }
       }
-      return wrapper.data(reports);
+
+      const totalPages = Math.ceil(total / limit);
+      const meta = { page: Number(page), limit: Number(limit), total, totalPages };
+      return wrapper.paginationData(reports, meta);
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }
@@ -118,6 +133,20 @@ export default class ReportService {
         return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
       }
       return wrapper.data(report);
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
+
+  static getReportsByProgress = async (stage) => {
+    try {
+      console.log("Tes")
+      const reports = await ReportRepository.findReportsByProgress(stage);
+      if (!reports || reports.length === 0) {
+        return wrapper.error(new NotFoundError("Laporan tidak ditemukan untuk tahap ini"));
+      }
+      return wrapper.data(reports);
+
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }

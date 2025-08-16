@@ -48,14 +48,14 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports() {
+  static async findAllReports(offset = 0, limit = 10) {
     return prisma.report.findMany({
+      skip: offset,
+      take: limit,
       select: {
         report_id: true,
         title: true,
         description: true,
-        verification_status: true,
-        verification_notes: true,
         address: {
           select: {
             street: true,
@@ -65,8 +65,23 @@ export default class ReportRepository {
             regency_id: true,
           }
         },
+        verification_status: true,
+        verification_notes: true,
+        photoUrl: true,
+      }
+    })
+  }
+
+  static async countReportsByProgress(stage) {
+    return prisma.report_progress.count({
+      where: {
+        stage: stage,
       }
     });
+  }
+
+  static async countAllReports() {
+    return prisma.report.count();
   }
 
   static async findReportsByProvince(provinceId) {
@@ -116,5 +131,25 @@ export default class ReportRepository {
         photoUrl: true,
       }
     });
+  }
+
+  static async findReportsByProgress(stage) {
+    return prisma.report_progress.findMany({
+      where: {
+        stage: stage,
+      },
+      select: {
+        report_id: true,
+        progress_notes: true,
+        stage: true,
+        photo_url: true,
+        reviewer: {
+          select: {
+            username: true,
+            role: true,
+          }
+        },
+      }
+    })
   }
 }
