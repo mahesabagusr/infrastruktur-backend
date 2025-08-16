@@ -26,7 +26,7 @@ router.get('/report/progress', verifyToken, getAllReportByProgress)
 router.post('/report', verifyToken, upload.single('photo'), addReport);
 router.post('/report/:reportId/progress', verifyToken, basicAuth, upload.single('photo'), addReportProgress);
 router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
-router.get('/report', verifyToken, getAllReport)
+router.get('/report', getAllReport)
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 
 

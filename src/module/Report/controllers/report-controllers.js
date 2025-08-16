@@ -176,10 +176,12 @@ const addReportProgress = async (req, res) => {
 
 const getAllReport = async (req, res) => {
   try {
-    const result = await ReportService.getAllReport();
+    const { page, limit, stage } = req.query;
+    const query = { page, limit, stage };
+    const result = await ReportService.getAllReport(query);
 
     if (result.err) {
-      return wrapper.response(
+      return wrapper.paginationResponse(
         res,
         "fail",
         result,
@@ -188,7 +190,7 @@ const getAllReport = async (req, res) => {
       );
     }
 
-    return wrapper.response(
+    return wrapper.paginationResponse(
       res,
       "success",
       result,
@@ -198,10 +200,11 @@ const getAllReport = async (req, res) => {
 
   } catch (err) {
     logger.error(`Unexpected error during getAllReport: ${err.message}`);
-    return wrapper.response(
+    return wrapper.paginationResponse(
       res,
       "fail",
       { err: err.message, data: null },
+      {},
       "An unexpected error occurred",
       httpError.INTERNAL_ERROR
     );
