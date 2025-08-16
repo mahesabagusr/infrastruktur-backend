@@ -122,4 +122,17 @@ export default class ReportService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+  static getReportsByProgress = async (stage) => {
+    try {
+      const reports = await ReportRepository.findReportsByProgress(stage);
+      if (!reports || reports.length === 0) {
+        return wrapper.error(new NotFoundError("Laporan tidak ditemukan untuk tahap ini"));
+      }
+      return wrapper.data(reports);
+
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 }

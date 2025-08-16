@@ -273,10 +273,47 @@ const getReportById = async (req, res) => {
       "fail",
       { err: err.message, data: null },
       "An unexpected error occurred",
-      httpError.INTERNAL_ERROR 
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
+const getAllReportByProgress = async (req, res) => {
+  try {
+    const { stage } = req.query;
+
+    const result = await ReportService.getReportsByProgress(stage);
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal mendapatkan laporan berdasarkan progress",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil mendapatkan laporan berdasarkan progress",
+      http.OK
+    );
+
+
+  } catch (err) {
+    logger.error(`Unexpected error during getAllReportByProgress: ${err.message}`);
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
     );
   }
 }
 
 
-export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById };
+export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById, getAllReportByProgress };

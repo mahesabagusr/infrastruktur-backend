@@ -1,7 +1,7 @@
 import express from 'express';
 import { userRegister, userLogin, refreshToken, userLogout } from '@/module/User/controllers/users-controllers.js';
 import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/module/Provinces/controllers/provinces-controllers.js';
-import { addReport, addReportProgress, getAllReport, getAllReportsByProvince, verifyReport } from '@/module/Report/controllers/report-controllers.js';
+import { addReport, addReportProgress, getAllReport, getAllReportByProgress, getAllReportsByProvince, verifyReport } from '@/module/Report/controllers/report-controllers.js';
 import { verifyToken } from '@/middlewares/jwt-auth.js';
 import { basicAuth } from '@/middlewares/basic-auth.js';
 import upload from '@/helpers/utils/multer.js';
@@ -27,5 +27,6 @@ router.post('/report/:reportId/progress', verifyToken, basicAuth, upload.single(
 router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
 router.get('/report', verifyToken, getAllReport)
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
+router.get('/report/progress', verifyToken, getAllReportByProgress)
 
 export default router;

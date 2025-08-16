@@ -117,4 +117,24 @@ export default class ReportRepository {
       }
     });
   }
+
+  static async findReportsByProgress(stage){
+    return prisma.report_progress.findMany({
+      where: {
+        stage : stage,
+      },
+      select : {
+        report_id: true,
+        progress_notes: true,
+        stage: true,
+        photo_url: true,
+        reviewer: {
+          select: {
+            username: true,
+            role: true,
+          }
+        },
+      }
+    })
+  }
 }
