@@ -48,10 +48,19 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports(offset = 0, limit = 10) {
+  static async findAllReports(offset, limit, stage, status) {
+    const where = {};
+
+    if (stage) {
+      where.progressUpdates = { some: { stage } };
+    }
+    if (status) {
+      where.verification_status = status;
+    }
     return prisma.report.findMany({
       skip: offset,
       take: limit,
+      where,
       select: {
         report_id: true,
         title: true,
@@ -68,8 +77,22 @@ export default class ReportRepository {
         verification_status: true,
         verification_notes: true,
         photoUrl: true,
+        progressUpdates: {
+          select: {
+            report_progress_id: true,
+            progress_notes: true,
+            stage: true,
+            createdAt: true,
+            reviewer: {
+              select: {
+                username: true,
+              }
+            },
+            photo_url: true,
+          }
+        }
       }
-    })
+    });
   }
 
   static async countReportsByProgress(stage) {
@@ -80,8 +103,17 @@ export default class ReportRepository {
     });
   }
 
-  static async countAllReports() {
-    return prisma.report.count();
+  static async countAllReports(stage, status) {
+    const where = {};
+
+    if (stage) {
+      where.progressUpdates = { some: { stage } }
+    };
+    if (status) {
+      where.verification_status = status;
+    }
+
+    return prisma.report.count({ where });
   }
 
   static async findReportsByProvince(provinceId) {
@@ -133,22 +165,47 @@ export default class ReportRepository {
     });
   }
 
-  static async findReportsByProgress(stage) {
-    return prisma.report_progress.findMany({
+  static async findReportsByProgress(stage, offset = 0, limit = 10) {
+    return prisma.report.findMany({
+      skip: offset,
+      take: limit,
       where: {
-        stage: stage,
+        progressUpdates: {
+          some: {
+            stage: stage
+          }
+        }
       },
       select: {
         report_id: true,
-        progress_notes: true,
-        stage: true,
-        photo_url: true,
-        reviewer: {
+        title: true,
+        description: true,
+        address: {
           select: {
-            username: true,
-            role: true,
+            street: true,
+            latitude: true,
+            longitude: true,
+            province_id: true,
+            regency_id: true,
           }
         },
+        verification_status: true,
+        verification_notes: true,
+        photoUrl: true,
+        progressUpdates: {
+          select: {
+            report_progress_id: true,
+            progress_notes: true,
+            stage: true,
+            createdAt: true,
+            reviewer: {
+              select: {
+                username: true,
+              }
+            },
+            photo_url: true,
+          }
+        }
       }
     })
   }

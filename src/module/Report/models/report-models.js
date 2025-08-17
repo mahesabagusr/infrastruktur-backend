@@ -65,6 +65,28 @@ const verifyReportModel = joi.object({
   }),
 })
 
+const getAllReportByProgressModel = joi.object({
+  page: joi.number().integer().min(1).default(1).messages({
+    'number.base': 'Halaman harus berupa angka.',
+    'number.integer': 'Halaman harus berupa bilangan bulat.',
+    'number.min': 'Halaman minimal adalah {#limit}.',
+  }),
+  limit: joi.number().integer().min(1).max(100).default(10).messages({
+    'number.base': 'Batas harus berupa angka.',
+    'number.integer': 'Batas harus berupa bilangan bulat.',
+    'number.min': 'Batas minimal adalah {#limit}.',
+    'number.max': 'Batas maksimal adalah {#limit}.',
+  }),
+  status: joi.string().valid('PENDING', 'VERIFIED', 'REJECTED').optional().messages({
+    'string.base': 'Status harus berupa teks.',
+    'any.only': 'Status harus salah satu dari: PENDING, VERIFIED, REJECTED.',
+  }),
+  stage: joi.string().valid(...progressStageEnum).optional().messages({
+    'string.base': 'Stage harus berupa teks.',
+    'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
+  })
+})
+
 const createReportProgressSchema = joi.object({
   progressNotes: joi.string().min(10).required().messages({
     'string.base': 'Progress Notes harus berupa teks',
@@ -79,4 +101,4 @@ const createReportProgressSchema = joi.object({
 
 });
 
-export { reportModel, createReportProgressSchema, verifyReportModel };
+export { reportModel, createReportProgressSchema, verifyReportModel, getAllReportByProgressModel };

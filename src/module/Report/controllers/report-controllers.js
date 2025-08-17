@@ -4,7 +4,7 @@ import {
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
 import { isValidPayload } from '@/helpers/utils/validator.js';
-import { createReportProgressSchema, reportModel, verifyReportModel } from '@/module/Report/models/report-models.js';
+import { createReportProgressSchema, reportModel, verifyReportModel, getAllReportByProgressModel } from '@/module/Report/models/report-models.js';
 import ReportService from '@/module/Report/services/report-services.js';
 import logger from '@/helpers/utils/logger.js';
 import { BadRequestError } from '@/helpers/error/index.js';
@@ -176,8 +176,19 @@ const addReportProgress = async (req, res) => {
 
 const getAllReport = async (req, res) => {
   try {
-    const { page, limit, stage } = req.query;
-    const query = { page, limit, stage };
+    const validatePayload = isValidPayload(req.query, getAllReportByProgressModel);
+
+    if (validatePayload.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        validatePayload,
+        "Invalid Payload",
+        httpError.EXPECTATION_FAILED
+      );
+    }
+    const query = validatePayload.data;
+    
     const result = await ReportService.getAllReport(query);
 
     if (result.err) {
@@ -281,42 +292,6 @@ const getReportById = async (req, res) => {
   }
 }
 
-const getAllReportByProgress = async (req, res) => {
-  try {
-    const { stage } = req.query;
-
-    const result = await ReportService.getReportsByProgress(stage);
-
-    if (result.err) {
-      return wrapper.response(
-        res,
-        "fail",
-        result,
-        "Gagal mendapatkan laporan berdasarkan progress",
-        httpError.NOT_FOUND
-      );
-    }
-
-    return wrapper.response(
-      res,
-      "success",
-      result,
-      "Berhasil mendapatkan laporan berdasarkan progress",
-      http.OK
-    );
 
 
-  } catch (err) {
-    logger.error(`Unexpected error during getAllReportByProgress: ${err.message}`);
-    return wrapper.response(
-      res,
-      "fail",
-      { err: err.message, data: null },
-      "An unexpected error occurred",
-      httpError.INTERNAL_ERROR
-    );
-  }
-}
-
-
-export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById, getAllReportByProgress };
+export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById };
