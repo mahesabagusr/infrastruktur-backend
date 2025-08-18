@@ -59,6 +59,8 @@ export default class UserService {
         token: accessToken,
         refreshToken,
         username: user.username,
+        email: user.email,
+        signature: user.signature,
         role: user.role,
       }
 
@@ -93,6 +95,8 @@ export default class UserService {
         token: newAccessToken,
         refreshToken: newRefreshToken,
         username: activeToken.user.username,
+        email: activeToken.user.email,
+        signature: activeToken.user.signature,
         role: activeToken.user.role,
       };
 

@@ -87,12 +87,12 @@ export default class ReportService {
 
   static getAllReport = async (query) => {
     try {
-      const { page = 1, limit = 10, stage, status } = query;
+      const { page = 1, limit = 10, stage, status, username, signature } = query;
       const offset = (page - 1) * limit;
 
-      const reports = await ReportRepository.findAllReports(offset, limit, stage, status);
-      const total = await ReportRepository.countAllReports(stage, status);
-      
+      const reports = await ReportRepository.findAllReports({ offset, limit, stage, status, username, signature });
+      const total = await ReportRepository.countAllReports({ stage, status, username, signature });
+
       if (!reports || reports.length === 0) {
         return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
       }
@@ -128,5 +128,7 @@ export default class ReportService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+
 
 }

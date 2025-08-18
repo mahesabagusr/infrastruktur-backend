@@ -188,7 +188,7 @@ const getAllReport = async (req, res) => {
       );
     }
     const query = validatePayload.data;
-    
+
     const result = await ReportService.getAllReport(query);
 
     if (result.err) {
@@ -291,6 +291,7 @@ const getReportById = async (req, res) => {
     );
   }
 }
+
 
 
 

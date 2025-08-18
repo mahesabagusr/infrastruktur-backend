@@ -1,4 +1,5 @@
 
+
 import joi from 'joi';
 
 const progressStageEnum = ['REVIEW', 'INPROGRESS', 'COMPLETED'];
@@ -84,8 +85,16 @@ const getAllReportByProgressModel = joi.object({
   stage: joi.string().valid(...progressStageEnum).optional().messages({
     'string.base': 'Stage harus berupa teks.',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
-  })
-})
+  }),
+  username: joi.string().optional().messages({
+    'string.base': 'Username harus berupa teks.',
+  }),
+  signature: joi.string().optional().messages({
+    'string.base': 'Signature harus berupa teks.',
+  }),
+}).and('username', 'signature').messages({
+  'object.and': 'Jika ingin mencari berdasarkan username atau signature, keduanya harus diisi bersamaan.',
+});
 
 const createReportProgressSchema = joi.object({
   progressNotes: joi.string().min(10).required().messages({
