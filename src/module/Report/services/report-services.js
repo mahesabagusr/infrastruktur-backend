@@ -57,6 +57,14 @@ export default class ReportService {
     try {
       const { progressNotes: progress_notes, stage, email, image, reportId } = payload;
 
+      const report = await ReportRepository.findReportById(reportId);
+      if (!report || report.verification_status !== 'verified') {
+        const err = !report
+          ? new NotFoundError("Laporan tidak ditemukan")
+          : new BadRequestError("Laporan harus diverifikasi sebelum menambahkan progres");
+        return wrapper.error(err);
+      }
+
       const author = await UserRepository.findUserByEmailOrUsername(email);
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
