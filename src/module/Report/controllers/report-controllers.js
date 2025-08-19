@@ -11,17 +11,9 @@ import { BadRequestError } from '@/helpers/error/index.js';
 
 const addReport = async (req, res) => {
   try {
-    if (!req.file) {
-      return wrapper.response(
-        res,
-        "fail",
-        { err: new BadRequestError("File gambar diperlukan") },
-        "File gambar diperlukan",
-        httpError.BAD_REQUEST
-      );
-    }
+    let payload = { ...req.body, photo: req.file };
 
-    const validatePayload = await isValidPayload(req.body, reportModel);
+    const validatePayload = isValidPayload(payload, reportModel);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -33,7 +25,7 @@ const addReport = async (req, res) => {
       );
     }
 
-    const payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer };
+    payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer };
 
     const result = await ReportService.addReport(payload);
 
@@ -127,7 +119,7 @@ const addReportProgress = async (req, res) => {
       );
     }
 
-    const validatePayload = await isValidPayload(req.body, createReportProgressSchema);
+    const validatePayload = isValidPayload(req.body, createReportProgressSchema);
 
     if (validatePayload.err) {
       return wrapper.response(

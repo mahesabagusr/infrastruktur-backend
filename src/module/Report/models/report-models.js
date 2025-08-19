@@ -53,6 +53,9 @@ const reportModel = joi.object({
     'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',
     'any.required': 'Kabupaten/Kota wajib dipilih.',
   }),
+  photo: joi.any().required().messages({
+    'any.required': 'Foto wajib diunggah.',
+  })
 });
 
 const verifyReportModel = joi.object({
