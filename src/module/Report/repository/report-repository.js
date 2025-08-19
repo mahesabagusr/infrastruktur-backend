@@ -48,7 +48,7 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports(offset, limit, stage, status) {
+  static async findAllReports({ offset, limit, stage, status, username, signature }) {
     const where = {};
 
     if (stage) {
@@ -57,6 +57,17 @@ export default class ReportRepository {
     if (status) {
       where.verification_status = status;
     }
+    if (username && signature) {
+      where.author = {
+        AND: [
+          { username: { contains: username, mode: 'insensitive' } },
+          { signature: { contains: signature, mode: 'insensitive' } }]
+      }
+    }
+
+    console.log('where', where);
+
+    console.log(where)
     return prisma.report.findMany({
       skip: offset,
       take: limit,
@@ -103,7 +114,7 @@ export default class ReportRepository {
     });
   }
 
-  static async countAllReports(stage, status) {
+  static async countAllReports({ stage, status, username, signature }) {
     const where = {};
 
     if (stage) {
@@ -111,6 +122,13 @@ export default class ReportRepository {
     };
     if (status) {
       where.verification_status = status;
+    }
+    if (username && signature) {
+      where.author = {
+        AND: [
+          { username: { contains: username, mode: 'insensitive' } },
+          { signature: { contains: signature, mode: 'insensitive' } }]
+      }
     }
 
     return prisma.report.count({ where });
@@ -149,37 +167,6 @@ export default class ReportRepository {
         report_id: true,
         title: true,
         description: true,
-        verification_status: true,
-        verification_notes: true,
-        address: {
-          select: {
-            street: true,
-            latitude: true,
-            longitude: true,
-            province_id: true,
-            regency_id: true,
-          }
-        },
-        photoUrl: true,
-      }
-    });
-  }
-
-  static async findReportsByProgress(stage, offset = 0, limit = 10) {
-    return prisma.report.findMany({
-      skip: offset,
-      take: limit,
-      where: {
-        progressUpdates: {
-          some: {
-            stage: stage
-          }
-        }
-      },
-      select: {
-        report_id: true,
-        title: true,
-        description: true,
         address: {
           select: {
             street: true,
@@ -207,6 +194,7 @@ export default class ReportRepository {
           }
         }
       }
-    })
+    });
   }
+
 }

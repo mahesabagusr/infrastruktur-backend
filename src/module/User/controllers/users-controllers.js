@@ -95,17 +95,19 @@ const userLogin = async (req, res) => {
       );
     }
 
-    res.cookie("refreshToken", result.data.refreshToken, {
+    const { refreshToken, ...data } = result.data;
+
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
+    console.log(result);
     return wrapper.response(
       res,
       "success",
-      { data: { token: result.data.token, username: result.data.username, role: result.data.role } },
+      { data: data },
       "User Login Successful",
       http.OK
     );
@@ -143,7 +145,9 @@ const refreshToken = async (req, res) => {
       );
     }
 
-    res.cookie('refreshToken', result.data.refreshToken, {
+    const { refreshToken, ...data } = result.data;
+
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
@@ -152,7 +156,7 @@ const refreshToken = async (req, res) => {
     return wrapper.response(
       res,
       "success",
-      { data: { token: result.data.token, username: result.data.username, role: result.data.role } },
+      { data: data },
       "Token refreshed successfully",
       http.OK
     );

@@ -8,34 +8,34 @@ import {
   GatewayTimeoutError,
   ServiceUnavailableError,
   UnauthorizedError,
+  ValidationError
 } from '@/helpers/error/index.js';
-
-
 import { ERROR as httpError } from '@/helpers/http-status/status_code.js';
 
 const response = (res, type, result, message = '', code = 200) => {
   let status = true;
-  let data = result && result.data !== undefined ? result.data : null;
+  let data = result?.data ?? null;
 
   if (type === 'fail') {
     status = false;
-    data = '';
-    message = result.err && result.err.message ? result.err.message : message;
+    data = null;
+    message = result.err?.message || message;
     code = checkErrorCode(result.err);
   }
 
   res.status(code).json({
-    status: status,
+    status,
     data,
     message,
     code,
+    ...(result.err instanceof ValidationError ? { errors: result.err.errors } : null),
   });
 };
 
 const paginationResponse = (res, type, result, message = '', code = 200) => {
   let status = true;
-  let data = result && result.data !== undefined ? result.data : null;
-  let meta = result && result.meta !== undefined ? result.meta : null;
+  let data = result?.data ?? null;
+  let meta = result?.meta ?? null;
   if (type === 'fail') {
     status = false;
     data = '';
@@ -49,6 +49,7 @@ const paginationResponse = (res, type, result, message = '', code = 200) => {
     meta,
     message,
     code,
+    ...(result.err instanceof ValidationError ? { errors: result.err.errors } : null),
   });
 }
 
@@ -73,6 +74,8 @@ const checkErrorCode = (error) => {
       return httpError.SERVICE_UNAVAILABLE;
     case UnauthorizedError:
       return httpError.UNAUTHORIZED;
+    case ValidationError:
+      return httpError.BAD_REQUEST;
     default:
       return httpError.INTERNAL_ERROR;
   }

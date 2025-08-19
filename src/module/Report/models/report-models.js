@@ -1,4 +1,5 @@
 
+
 import joi from 'joi';
 
 const progressStageEnum = ['REVIEW', 'INPROGRESS', 'COMPLETED'];
@@ -52,6 +53,9 @@ const reportModel = joi.object({
     'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',
     'any.required': 'Kabupaten/Kota wajib dipilih.',
   }),
+  photo: joi.any().required().messages({
+    'any.required': 'Foto wajib diunggah.',
+  })
 });
 
 const verifyReportModel = joi.object({
@@ -84,8 +88,16 @@ const getAllReportByProgressModel = joi.object({
   stage: joi.string().valid(...progressStageEnum).optional().messages({
     'string.base': 'Stage harus berupa teks.',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
-  })
-})
+  }),
+  username: joi.string().optional().messages({
+    'string.base': 'Username harus berupa teks.',
+  }),
+  signature: joi.string().optional().messages({
+    'string.base': 'Signature harus berupa teks.',
+  }),
+}).and('username', 'signature').messages({
+  'object.and': 'Jika ingin mencari berdasarkan username atau signature, keduanya harus diisi bersamaan.',
+});
 
 const createReportProgressSchema = joi.object({
   progressNotes: joi.string().min(10).required().messages({
@@ -98,7 +110,9 @@ const createReportProgressSchema = joi.object({
     'string.base': 'Stage harus berupa teks',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
   }),
-
+  photo: joi.any().required().messages({
+    'any.required': 'Foto wajib diunggah.',
+  }),
 });
 
 export { reportModel, createReportProgressSchema, verifyReportModel, getAllReportByProgressModel };
