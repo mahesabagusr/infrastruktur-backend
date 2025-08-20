@@ -55,7 +55,16 @@ export default class UserService {
 
       await UserRepository.saveRefreshToken(refreshToken, user.user_id);
 
-      return wrapper.data({ token: accessToken, refreshToken });
+      const userData = {
+        token: accessToken,
+        refreshToken,
+        username: user.username,
+        email: user.email,
+        signature: user.signature,
+        role: user.role,
+      }
+
+      return wrapper.data(userData);
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }
@@ -64,7 +73,7 @@ export default class UserService {
   static async refreshToken(token) {
     try {
       const { error } = verifyRefreshToken(token);
-      
+
       if (error) {
         return wrapper.error(new UnauthorizedError("Invalid refresh token."));
       }
@@ -82,7 +91,16 @@ export default class UserService {
 
       await UserRepository.saveRefreshToken(newRefreshToken, activeToken.user.user_id);
 
-      return wrapper.data({ token: newAccessToken, refreshToken: newRefreshToken });
+      const userData = {
+        token: newAccessToken,
+        refreshToken: newRefreshToken,
+        username: activeToken.user.username,
+        email: activeToken.user.email,
+        signature: activeToken.user.signature,
+        role: activeToken.user.role,
+      };
+
+      return wrapper.data(userData);
     } catch (err) {
       return wrapper.error(new UnauthorizedError("Refresh token verification failed : " + err.message));
     }

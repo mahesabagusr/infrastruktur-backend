@@ -48,14 +48,34 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports() {
+  static async findAllReports({ offset, limit, stage, status, username, signature }) {
+    const where = {};
+
+    if (stage) {
+      where.progressUpdates = { some: { stage } };
+    }
+    if (status) {
+      where.verification_status = status;
+    }
+    if (username && signature) {
+      where.author = {
+        AND: [
+          { username: { contains: username, mode: 'insensitive' } },
+          { signature: { contains: signature, mode: 'insensitive' } }]
+      }
+    }
+
+    console.log('where', where);
+
+    console.log(where)
     return prisma.report.findMany({
+      skip: offset,
+      take: limit,
+      where,
       select: {
         report_id: true,
         title: true,
         description: true,
-        verification_status: true,
-        verification_notes: true,
         address: {
           select: {
             street: true,
@@ -65,8 +85,53 @@ export default class ReportRepository {
             regency_id: true,
           }
         },
+        verification_status: true,
+        verification_notes: true,
+        photoUrl: true,
+        progressUpdates: {
+          select: {
+            report_progress_id: true,
+            progress_notes: true,
+            stage: true,
+            createdAt: true,
+            reviewer: {
+              select: {
+                username: true,
+              }
+            },
+            photo_url: true,
+          }
+        }
       }
     });
+  }
+
+  static async countReportsByProgress(stage) {
+    return prisma.report_progress.count({
+      where: {
+        stage: stage,
+      }
+    });
+  }
+
+  static async countAllReports({ stage, status, username, signature }) {
+    const where = {};
+
+    if (stage) {
+      where.progressUpdates = { some: { stage } }
+    };
+    if (status) {
+      where.verification_status = status;
+    }
+    if (username && signature) {
+      where.author = {
+        AND: [
+          { username: { contains: username, mode: 'insensitive' } },
+          { signature: { contains: signature, mode: 'insensitive' } }]
+      }
+    }
+
+    return prisma.report.count({ where });
   }
 
   static async findReportsByProvince(provinceId) {
@@ -102,8 +167,6 @@ export default class ReportRepository {
         report_id: true,
         title: true,
         description: true,
-        verification_status: true,
-        verification_notes: true,
         address: {
           select: {
             street: true,
@@ -113,8 +176,25 @@ export default class ReportRepository {
             regency_id: true,
           }
         },
+        verification_status: true,
+        verification_notes: true,
         photoUrl: true,
+        progressUpdates: {
+          select: {
+            report_progress_id: true,
+            progress_notes: true,
+            stage: true,
+            createdAt: true,
+            reviewer: {
+              select: {
+                username: true,
+              }
+            },
+            photo_url: true,
+          }
+        }
       }
     });
   }
+
 }

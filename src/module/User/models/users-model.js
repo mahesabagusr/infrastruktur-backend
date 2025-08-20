@@ -64,11 +64,13 @@ const registerModel = joi.object().keys({
 });
 
 const loginModel = joi.object().keys({
-  identifier: joi.string().messages({
-    'string.empty': 'Harap isi Username atau Email'
+  identifier: joi.string().required().messages({
+    'string.empty': 'Harap isi Username atau Email',
+    'any.required': 'Username atau Email wajib diisi.',
   }),
   password: joi.string().required().messages({
     'string.empty': 'Harap isi Password',
+    'any.required': 'Password wajib diisi.',
   })
 });
 

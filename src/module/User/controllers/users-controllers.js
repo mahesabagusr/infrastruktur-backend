@@ -95,17 +95,19 @@ const userLogin = async (req, res) => {
       );
     }
 
-    res.cookie("refreshToken", result.data.refreshToken, {
+    const { refreshToken, ...data } = result.data;
+
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
+    console.log(result);
     return wrapper.response(
       res,
       "success",
-      { data: { token: result.data.token } },
+      { data: data },
       "User Login Successful",
       http.OK
     );
@@ -143,13 +145,21 @@ const refreshToken = async (req, res) => {
       );
     }
 
-    res.cookie('refreshToken', result.data.refreshToken, {
+    const { refreshToken, ...data } = result.data;
+
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    return wrapper.response(res, "success", { data: { token: result.data.token } }, "Token refreshed successfully", http.OK);
+    return wrapper.response(
+      res,
+      "success",
+      { data: data },
+      "Token refreshed successfully",
+      http.OK
+    );
 
   } catch (err) {
     logger.error(`Unexpected error during refresh token: ${err.message}`);

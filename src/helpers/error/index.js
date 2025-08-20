@@ -7,6 +7,7 @@ import UnauthorizedError from './unauthorized_error.js';
 import ServiceUnavailableError from './service_unavailable_error.js';
 import GatewayTimeoutError from './gateway_timeout_error.js';
 import BadRequestError from './bad_request_error.js';
+import ValidationError from './validation_error.js';
 
 export {
   ConflictError,
@@ -17,5 +18,6 @@ export {
   UnauthorizedError,
   ServiceUnavailableError,
   GatewayTimeoutError,
-  BadRequestError
+  BadRequestError,
+  ValidationError
 };

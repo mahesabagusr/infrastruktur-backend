@@ -9,9 +9,7 @@ export default class ReportService {
   static async addReport(payload) {
     try {
       const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
-      console.log(email)
       const author = await UserRepository.findUserByEmailOrUsername(email);
-      console.log(author)
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
       }
@@ -59,6 +57,14 @@ export default class ReportService {
     try {
       const { progressNotes: progress_notes, stage, email, image, reportId } = payload;
 
+      const report = await ReportRepository.findReportById(reportId);
+      if (!report || report.verification_status !== 'verified') {
+        const err = !report
+          ? new NotFoundError("Laporan tidak ditemukan")
+          : new BadRequestError("Laporan harus diverifikasi sebelum menambahkan progres");
+        return wrapper.error(err);
+      }
+
       const author = await UserRepository.findUserByEmailOrUsername(email);
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
@@ -87,13 +93,21 @@ export default class ReportService {
     }
   }
 
-  static getAllReport = async () => {
+  static getAllReport = async (query) => {
     try {
-      const reports = await ReportRepository.findAllReports();
+      const { page = 1, limit = 10, stage, status, username, signature } = query;
+      const offset = (page - 1) * limit;
+
+      const reports = await ReportRepository.findAllReports({ offset, limit, stage, status, username, signature });
+      const total = await ReportRepository.countAllReports({ stage, status, username, signature });
+
       if (!reports || reports.length === 0) {
         return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
       }
-      return wrapper.data(reports);
+
+      const totalPages = Math.ceil(total / limit);
+      const meta = { page: Number(page), limit: Number(limit), total, totalPages };
+      return wrapper.paginationData(reports, meta);
     } catch (err) {
       return wrapper.error(new BadRequestError(err.message));
     }
@@ -122,4 +136,7 @@ export default class ReportService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+
+
 }

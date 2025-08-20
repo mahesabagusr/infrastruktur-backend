@@ -4,23 +4,15 @@ import {
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
 import { isValidPayload } from '@/helpers/utils/validator.js';
-import { createReportProgressSchema, reportModel, verifyReportModel } from '@/module/Report/models/report-models.js';
+import { createReportProgressSchema, reportModel, verifyReportModel, getAllReportByProgressModel } from '@/module/Report/models/report-models.js';
 import ReportService from '@/module/Report/services/report-services.js';
 import logger from '@/helpers/utils/logger.js';
-import { BadRequestError } from '@/helpers/error/index.js';
 
 const addReport = async (req, res) => {
   try {
-    if (!req.file) {
-      return wrapper.response(
-        res,
-        "fail",
-        { err: new BadRequestError("File gambar diperlukan") },
-        httpError.BAD_REQUEST
-      );
-    }
+    let payload = { ...req.body, photo: req.file };
 
-    const validatePayload = await isValidPayload(req.body, reportModel);
+    const validatePayload = isValidPayload(payload, reportModel);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -32,37 +24,30 @@ const addReport = async (req, res) => {
       );
     }
 
-    const payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer };
+    payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer };
 
-    const postRequest = async (data) => {
-      return await ReportService.addReport(data)
+    const result = await ReportService.addReport(payload);
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal menambahkan laporan",
+        httpError.NOT_FOUND
+      );
     }
 
-    const sendResponse = async (result) => {
-      console.log(result);
-      result.err
-        ? wrapper.response(
-          res,
-          "fail",
-          result,
-          "Gagal menambahkan laporan",
-          httpError.NOT_FOUND
-        )
-        : wrapper.response(
-          res,
-          "success",
-          result,
-          "Berhasil menambahkan laporan",
-          http.CREATED
-        );
-    }
-
-    return sendResponse(await postRequest(payload));
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil menambahkan laporan",
+      http.CREATED
+    );
 
   } catch (err) {
-
     logger.error(`Unexpected error during upload Report: ${err.message}`);
-
     return wrapper.response(
       res,
       "fail",
@@ -89,11 +74,7 @@ const verifyReport = async (req, res) => {
 
     const payload = { ...validatePayload.data, reportId: req.params.reportId, email: req.email };
 
-    const postRequest = async (data) => {
-      return await ReportService.verifyReport(data);
-    }
-
-    const result = await postRequest(payload);
+    const result = await ReportService.verifyReport(payload);
 
     if (result.err) {
       return wrapper.response(
@@ -103,19 +84,18 @@ const verifyReport = async (req, res) => {
         "Gagal memverifikasi laporan",
         httpError.NOT_FOUND
       );
-    } else {
-      return wrapper.response(
-        res,
-        "success",
-        result,
-        "Berhasil memverifikasi laporan",
-        http.OK
-      );
     }
+
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil memverifikasi laporan",
+      http.OK
+    );
 
   } catch (err) {
     logger.error(`Unexpected error during verifyReport: ${err.message}`);
-
     return wrapper.response(
       res,
       "fail",
@@ -125,18 +105,13 @@ const verifyReport = async (req, res) => {
     );
   }
 }
+
 const addReportProgress = async (req, res) => {
   try {
-    if (!req.file) {
-      return wrapper.response(
-        res,
-        "fail",
-        { err: new BadRequestError("File gambar diperlukan") },
-        httpError.BAD_REQUEST
-      );
-    }
 
-    const validatePayload = await isValidPayload(req.body, createReportProgressSchema);
+    let payload = { ...req.body, image: req.file };
+
+    const validatePayload = isValidPayload(payload, createReportProgressSchema);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -148,38 +123,31 @@ const addReportProgress = async (req, res) => {
       );
     }
 
-    const { reportId } = req.params
+    const { reportId } = req.params;
+    payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer, reportId };
 
-    const payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer, reportId };
+    const result = await ReportService.addReportProgress(payload);
 
-    const postRequest = async (data) => {
-      return await ReportService.addReportProgress(data)
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal menambahkan progress laporan",
+        httpError.NOT_FOUND
+      );
     }
 
-    const sendResponse = async (result) => {
-      console.log(result);
-      result.err
-        ? wrapper.response(
-          res,
-          "fail",
-          result,
-          "Gagal menambahkan laporan",
-          httpError.NOT_FOUND
-        )
-        : wrapper.response(
-          res,
-          "success",
-          result,
-          "Berhasil menambahkan laporan",
-          http.CREATED
-        );
-    }
-
-    return sendResponse(await postRequest(payload));
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil menambahkan progress laporan",
+      http.CREATED
+    );
 
   } catch (err) {
     logger.error(`Unexpected error during addReportProgress: ${err.message}`);
-
     return wrapper.response(
       res,
       "fail",
@@ -192,33 +160,46 @@ const addReportProgress = async (req, res) => {
 
 const getAllReport = async (req, res) => {
   try {
-    const reports = await ReportService.getAllReport();
+    const validatePayload = isValidPayload(req.query, getAllReportByProgressModel);
 
-    if (reports.err) {
+    if (validatePayload.err) {
       return wrapper.response(
         res,
         "fail",
-        reports,
+        validatePayload,
+        "Invalid Payload",
+        httpError.EXPECTATION_FAILED
+      );
+    }
+    const query = validatePayload.data;
+
+    const result = await ReportService.getAllReport(query);
+
+    if (result.err) {
+      return wrapper.paginationResponse(
+        res,
+        "fail",
+        result,
         "Gagal mendapatkan laporan",
         httpError.NOT_FOUND
       );
     }
 
-    return wrapper.response(
+    return wrapper.paginationResponse(
       res,
       "success",
-      reports,
+      result,
       "Berhasil mendapatkan laporan",
       http.OK
     );
 
   } catch (err) {
     logger.error(`Unexpected error during getAllReport: ${err.message}`);
-
-    return wrapper.response(
+    return wrapper.paginationResponse(
       res,
       "fail",
       { err: err.message, data: null },
+      {},
       "An unexpected error occurred",
       httpError.INTERNAL_ERROR
     );
@@ -228,14 +209,13 @@ const getAllReport = async (req, res) => {
 const getAllReportsByProvince = async (req, res) => {
   try {
     const { provinceId } = req.params;
+    const result = await ReportService.getAllReportsByProvince(provinceId);
 
-    const reports = await ReportService.getAllReportsByProvince(provinceId);
-
-    if (reports.err) {
+    if (result.err) {
       return wrapper.response(
         res,
         "fail",
-        reports,
+        result,
         "Gagal mendapatkan laporan berdasarkan provinsi",
         httpError.NOT_FOUND
       );
@@ -244,14 +224,13 @@ const getAllReportsByProvince = async (req, res) => {
     return wrapper.response(
       res,
       "success",
-      reports,
+      result,
       "Berhasil mendapatkan laporan berdasarkan provinsi",
       http.OK
     );
 
   } catch (err) {
     logger.error(`Unexpected error during getAllReportsByProvince: ${err.message}`);
-
     return wrapper.response(
       res,
       "fail",
@@ -265,14 +244,13 @@ const getAllReportsByProvince = async (req, res) => {
 const getReportById = async (req, res) => {
   try {
     const { reportId } = req.params;
+    const result = await ReportService.getReportById(reportId);
 
-    const report = await ReportService.getReportById(reportId);
-
-    if (report.err) {
+    if (result.err) {
       return wrapper.response(
         res,
         "fail",
-        report,
+        result,
         "Gagal mendapatkan laporan",
         httpError.NOT_FOUND
       );
@@ -281,12 +259,13 @@ const getReportById = async (req, res) => {
     return wrapper.response(
       res,
       "success",
-      report,
+      result,
       "Berhasil mendapatkan laporan",
       http.OK
     );
 
   } catch (err) {
+    logger.error(`Unexpected error during getReportById: ${err.message}`);
     return wrapper.response(
       res,
       "fail",
@@ -296,5 +275,8 @@ const getReportById = async (req, res) => {
     );
   }
 }
+
+
+
 
 export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById };

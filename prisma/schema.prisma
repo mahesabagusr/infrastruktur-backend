@@ -151,8 +151,13 @@ model article {
   article_id Int      @id @default(autoincrement())
   title      String
   content    String   @db.Text
+  slug       String   @unique
+  photoUrl   String?
+  
   author_id  Int
   author     user     @relation(fields: [author_id], references: [user_id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([author_id])
 }

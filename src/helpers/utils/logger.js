@@ -19,7 +19,7 @@ const logger = winston.createLogger({
       format: winston.format.combine(winston.format.colorize(), logFotmat),
     }),
 
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
+    new winston.transports.File({ filename: "logs/error.log", level: "error", maxsize: 10485760 }), // 10MB max size
 
     new winston.transports.File({ filename: "logs/combined.log" }),
   ],
