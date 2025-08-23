@@ -1,6 +1,6 @@
 import * as wrapper from "@/helpers/utils/wrapper.js";
 import { BadRequestError, NotFoundError } from "@/helpers/error/index.js";
-import uploadToCloudinary from "@/module/utils/image-upload.js";
+import { uploadToCloudinary, uploadManyToCloudinary } from "@/module/utils/image-upload.js";
 
 import ReportRepository from "@/module/Report/repository/report-repository.js";
 import UserRepository from "@/module/User/repository/user-repository.js";
@@ -8,22 +8,27 @@ import UserRepository from "@/module/User/repository/user-repository.js";
 export default class ReportService {
   static async addReport(payload) {
     try {
-      const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
+      const { title, description, latitude, longitude, street, provinceId, regencyId, email, images } = payload;
       const author = await UserRepository.findUserByEmailOrUsername(email);
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
       }
 
-      const uploadResult = await uploadToCloudinary(image);
-      if (!uploadResult) {
+      console.log(images)
+
+      const uploadResult = await uploadManyToCloudinary(images, { folder: "reports" }, 3);
+      const imageUrls = uploadResult.map(img => img.secure_url);
+      if (!imageUrls || imageUrls.length === 0) {
         return wrapper.error(new BadRequestError("Image upload failed"));
       }
-      const imageUrl = uploadResult.secure_url;
+
+      // const imageUrl = uploadResult.secure_url;
 
       const newReport = await ReportRepository.createReport({
         title, description, street, longitude, latitude, provinceId, regencyId,
         authorId: author.user_id,
-        imageUrl,
+        imageUrl: imageUrls[0],
+        imageUrls
       });
 
       if (!newReport) {
@@ -56,14 +61,6 @@ export default class ReportService {
   static async addReportProgress(payload) {
     try {
       const { progressNotes: progress_notes, stage, email, image, reportId } = payload;
-
-      const report = await ReportRepository.findReportById(reportId);
-      if (!report || report.verification_status !== 'verified') {
-        const err = !report
-          ? new NotFoundError("Laporan tidak ditemukan")
-          : new BadRequestError("Laporan harus diverifikasi sebelum menambahkan progres");
-        return wrapper.error(err);
-      }
 
       const author = await UserRepository.findUserByEmailOrUsername(email);
       if (!author) {
