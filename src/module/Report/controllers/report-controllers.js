@@ -284,7 +284,42 @@ const getReportById = async (req, res) => {
   }
 }
 
+const getReportProgressById = async (req, res) => {
+  try {
+    const { progressId } = req.params;
+    const result = await ReportService.getReportProgressById(progressId);
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal mendapatkan progress laporan",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil mendapatkan progress laporan",
+      http.OK
+    );
+
+  } catch (err) {
+    logger.error(`Unexpected error during getReportProgressById: ${err.message}`);
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
 
 
 
-export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById };
+
+export { addReport, addReportProgress, verifyReport, getAllReport, getAllReportsByProvince, getReportById, getReportProgressById };

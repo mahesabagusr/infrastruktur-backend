@@ -1,6 +1,6 @@
 import * as wrapper from "@/helpers/utils/wrapper.js";
 import { BadRequestError, NotFoundError } from "@/helpers/error/index.js";
-import  uploadToCloudinary  from "@/module/utils/image-upload.js";
+import uploadToCloudinary from "@/module/utils/image-upload.js";
 
 import ReportRepository from "@/module/Report/repository/report-repository.js";
 import UserRepository from "@/module/User/repository/user-repository.js";
@@ -135,6 +135,17 @@ export default class ReportService {
     }
   }
 
+  static getReportProgressById = async (progressId) => {
+    try {
+      const progress = await ReportRepository.findReportProgressById(progressId);
+      if (!progress) {
+        return wrapper.error(new NotFoundError("Progress laporan tidak ditemukan"));
+      }
+      return wrapper.data(progress);
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 
 
 }
