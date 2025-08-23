@@ -21,7 +21,7 @@ export default class ReportRepository {
       }
     });
   }
-  
+
   static async updateReportVerification(reportId, verificationData) {
     const { verification_status, verification_notes } = verificationData;
     return prisma.report.update({
@@ -64,7 +64,7 @@ export default class ReportRepository {
           { signature: { contains: signature, mode: 'insensitive' } }]
       }
     }
-    
+
     return prisma.report.findMany({
       skip: offset,
       take: limit,
@@ -73,30 +73,25 @@ export default class ReportRepository {
         report_id: true,
         title: true,
         description: true,
-        address: {
-          select: {
-            street: true,
-            latitude: true,
-            longitude: true,
-            province_id: true,
-            regency_id: true,
-          }
-        },
         verification_status: true,
         verification_notes: true,
         photoUrl: true,
+        createdAt: true,
+        author: { select: { username: true } },
+        address: {
+          select: {
+            street: true,
+            province: { select: { name: true, province_id: true } },
+            regency: { select: { name: true, province_id: true } },
+          }
+        },
+        _count: { select: { progressUpdates: true } },
         progressUpdates: {
+          orderBy: { createdAt: 'desc' },
           select: {
             report_progress_id: true,
-            progress_notes: true,
             stage: true,
             createdAt: true,
-            reviewer: {
-              select: {
-                username: true,
-              }
-            },
-            photo_url: true,
           }
         }
       }
@@ -164,19 +159,22 @@ export default class ReportRepository {
         report_id: true,
         title: true,
         description: true,
+        verification_status: true,
+        verification_notes: true,
+        photoUrl: true,
+        createdAt: true,
         address: {
           select: {
             street: true,
             latitude: true,
             longitude: true,
-            province_id: true,
-            regency_id: true,
+            province: { select: { province_id: true, name: true } },
+            regency: { select: { regency_id: true, name: true } },
           }
         },
-        verification_status: true,
-        verification_notes: true,
-        photoUrl: true,
+        _count: { select: { progressUpdates: true } },
         progressUpdates: {
+          orderBy: { createdAt: 'asc' },
           select: {
             report_progress_id: true,
             progress_notes: true,
