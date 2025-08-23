@@ -114,4 +114,16 @@ export default class UserService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
+
+  static async getUserById(userId) {
+    try {
+      const user = await UserRepository.findUserById(userId);
+      if (!user) {
+        return wrapper.error(new NotFoundError("User not found."));
+      }
+      return wrapper.data(user);
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 }

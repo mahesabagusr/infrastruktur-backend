@@ -192,4 +192,12 @@ export default class ReportRepository {
     });
   }
 
+  static findReportProgressById(progressId) {
+    return prisma.report_progress.findUnique({
+      where: {
+        report_progress_id: parseInt(progressId),
+      }
+    });
+  }
+
 }

@@ -205,4 +205,39 @@ const userLogout = async (req, res) => {
   }
 }
 
-export { userRegister, userLogin, refreshToken, userLogout };
+const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserService.getUserById(userId);
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal mendapatkan user",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil mendapatkan user",
+      http.OK
+    );
+
+  } catch (err) {
+    logger.error(`Unexpected error during getUserById: ${err.message}`);
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
+export { userRegister, userLogin, refreshToken, userLogout, getUserById };
