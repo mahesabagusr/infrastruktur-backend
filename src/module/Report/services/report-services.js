@@ -1,6 +1,6 @@
 import * as wrapper from "@/helpers/utils/wrapper.js";
 import { BadRequestError, NotFoundError } from "@/helpers/error/index.js";
-import { uploadToCloudinary, uploadManyToCloudinary } from "@/module/utils/image-upload.js";
+import  uploadToCloudinary  from "@/module/utils/image-upload.js";
 
 import ReportRepository from "@/module/Report/repository/report-repository.js";
 import UserRepository from "@/module/User/repository/user-repository.js";
@@ -8,27 +8,28 @@ import UserRepository from "@/module/User/repository/user-repository.js";
 export default class ReportService {
   static async addReport(payload) {
     try {
-      const { title, description, latitude, longitude, street, provinceId, regencyId, email, images } = payload;
+      const { title, description, latitude, longitude, street, provinceId, regencyId, email, image } = payload;
       const author = await UserRepository.findUserByEmailOrUsername(email);
       if (!author) {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
       }
 
-      console.log(images)
+      if (!image) {
+        return wrapper.error(new BadRequestError("Foto laporan wajib diunggah."));
+      }
 
-      const uploadResult = await uploadManyToCloudinary(images, { folder: "reports" }, 3);
-      const imageUrls = uploadResult.map(img => img.secure_url);
-      if (!imageUrls || imageUrls.length === 0) {
+      // Use the single uploader utility
+      const uploadResult = await uploadToCloudinary(image, { folder: "reports" });
+      if (!uploadResult || !uploadResult.secure_url) {
         return wrapper.error(new BadRequestError("Image upload failed"));
       }
 
-      // const imageUrl = uploadResult.secure_url;
+      const imageUrl = uploadResult.secure_url;
 
       const newReport = await ReportRepository.createReport({
         title, description, street, longitude, latitude, provinceId, regencyId,
         authorId: author.user_id,
-        imageUrl: imageUrls[0],
-        imageUrls
+        imageUrl,
       });
 
       if (!newReport) {

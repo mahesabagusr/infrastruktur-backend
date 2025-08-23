@@ -2,7 +2,7 @@ import { prisma } from "@/helpers/db/prisma.js";
 
 export default class ReportRepository {
   static async createReport(reportData) {
-    const { title, description, street, longitude, latitude, provinceId, regencyId, authorId, imageUrl, imageUrls } = reportData;
+    const { title, description, street, longitude, latitude, provinceId, regencyId, authorId, imageUrl } = reportData;
     return prisma.report.create({
       data: {
         title,
@@ -18,9 +18,6 @@ export default class ReportRepository {
         },
         author_id: authorId,
         photoUrl: imageUrl,
-        images: {
-          create: (imageUrls || []).map(url => ({ url }))
-        }
       }
     });
   }
