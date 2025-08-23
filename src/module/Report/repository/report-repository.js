@@ -2,7 +2,7 @@ import { prisma } from "@/helpers/db/prisma.js";
 
 export default class ReportRepository {
   static async createReport(reportData) {
-    const { title, description, street, longitude, latitude, provinceId, regencyId, authorId, imageUrl } = reportData;
+    const { title, description, street, longitude, latitude, provinceId, regencyId, authorId, imageUrl, imageUrls } = reportData;
     return prisma.report.create({
       data: {
         title,
@@ -18,10 +18,13 @@ export default class ReportRepository {
         },
         author_id: authorId,
         photoUrl: imageUrl,
+        images: {
+          create: (imageUrls || []).map(url => ({ url }))
+        }
       }
     });
   }
-
+  
   static async updateReportVerification(reportId, verificationData) {
     const { verification_status, verification_notes } = verificationData;
     return prisma.report.update({
@@ -64,10 +67,7 @@ export default class ReportRepository {
           { signature: { contains: signature, mode: 'insensitive' } }]
       }
     }
-
-    console.log('where', where);
-
-    console.log(where)
+    
     return prisma.report.findMany({
       skip: offset,
       take: limit,

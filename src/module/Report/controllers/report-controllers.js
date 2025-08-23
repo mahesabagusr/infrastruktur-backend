@@ -7,6 +7,7 @@ import { isValidPayload } from '@/helpers/utils/validator.js';
 import { createReportProgressSchema, reportModel, verifyReportModel, getAllReportByProgressModel } from '@/module/Report/models/report-models.js';
 import ReportService from '@/module/Report/services/report-services.js';
 import logger from '@/helpers/utils/logger.js';
+import { BadRequestError } from '@/helpers/error/index.js';
 
 const addReport = async (req, res) => {
   try {
@@ -108,10 +109,17 @@ const verifyReport = async (req, res) => {
 
 const addReportProgress = async (req, res) => {
   try {
+    if (!req.file) {
+      return wrapper.response(
+        res,
+        "fail",
+        { err: new BadRequestError("File gambar diperlukan") },
+        "File gambar diperlukan",
+        httpError.BAD_REQUEST
+      );
+    }
 
-    let payload = { ...req.body, image: req.file };
-
-    const validatePayload = isValidPayload(payload, createReportProgressSchema);
+    const validatePayload = isValidPayload(req.body, createReportProgressSchema);
 
     if (validatePayload.err) {
       return wrapper.response(
@@ -124,7 +132,7 @@ const addReportProgress = async (req, res) => {
     }
 
     const { reportId } = req.params;
-    payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer, reportId };
+    const payload = { ...validatePayload.data, email: req.user.email, image: req.file.buffer, reportId };
 
     const result = await ReportService.addReportProgress(payload);
 
