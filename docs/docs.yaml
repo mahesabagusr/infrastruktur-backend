@@ -1,842 +1,290 @@
 openapi: 3.0.3
 info:
-  title: JagaKota API Documentation
-  description: Dokumentasi API JagaKota menyediakan panduan komprehensif untuk mengelola otentikasi pengguna, data geografis, dan pelaporan masalah perkotaan. API ini memungkinkan pengguna untuk mendaftar, login, mengirimkan laporan, serta mengakses data lokasi seperti provinsi dan kabupaten di Indonesia.
-  version: 2.0.0
-  contact:
-    name: API Support
-    email: support@jagakota.id
+  title: JagaKota API
+  description: API untuk otentikasi pengguna, data lokasi (provinsi/kabupaten), dan laporan. (Tanpa Article)
+  version: 2.1.1
 servers:
   - url: /
     description: Development server
 
-# Grouping endpoints
 tags:
   - name: Auth
-    description: Operasi yang berhubungan dengan otentikasi pengguna (Registrasi, Login, Logout, Refresh Token).
+    description: Registrasi, login, logout, refresh token
+  - name: User
+    description: Profil pengguna publik/privat
   - name: Location
-    description: Operasi untuk mendapatkan data geografis seperti provinsi dan kabupaten.
+    description: Data provinsi dan kabupaten/kota
   - name: Report
-    description: Operasi yang berhubungan dengan laporan pengguna, verifikasi, dan progres.
+    description: Laporan dan progres
 
-# Reusable components
 components:
-  # Security Schemes for authentication (JWT Bearer Token)
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
 
-  # Reusable Schemas for request bodies and responses
   schemas:
-    # --- Generic Response Schemas ---
     SuccessResponse:
       type: object
       properties:
-        status:
-          type: string
-          example: "success"
-        message:
-          type: string
-        data:
-          type: object
-          nullable: true
-
+        status: { type: string, example: success }
+        message: { type: string, example: OK }
+        data: { nullable: true }
     ErrorResponse:
       type: object
-      required:
-        - status
-        - message
-        - data
       properties:
-        status:
-          type: string
-          example: "fail"
-        message:
-          type: string
-          example: "An error occurred"
+        status: { type: string, example: fail }
+        message: { type: string, example: Terjadi kesalahan }
         data:
           type: object
           properties:
-            err:
-              type: string
-              description: Pesan error yang spesifik.
-            data:
-              type: object
-              nullable: true
-              example: null
-
-    # --- Auth Schemas ---
-    UserRegisterInput:
-      type: object
-      required:
-        - username
-        - firstName
-        - email
-        - password
-        - street
-        - provinceId
-        - regencyId
-      properties:
-        username:
-          type: string
-          minLength: 3
-          maxLength: 30
-          example: "johndoe"
-        firstName:
-          type: string
-          maxLength: 50
-          example: "John"
-        lastName:
-          type: string
-          maxLength: 50
-          example: "Doe"
-        email:
-          type: string
-          format: email
-          example: "johndoe@example.com"
-        password:
-          type: string
-          format: password
-          minLength: 8
-          description: "Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka."
-          example: "Password123"
-        street:
-          type: string
-          example: "Jl. Jenderal Sudirman No. 5"
-        phoneNumber:
-          type: string
-          description: "Nomor telepon format Indonesia (e.g., 0812..., +62812...)"
-          example: "081234567890"
-        provinceId:
-          type: integer
-          example: 11
-        regencyId:
-          type: integer
-          example: 1171
-
-    UserLoginInput:
-      type: object
-      required:
-        - identifier
-        - password
-      properties:
-        identifier:
-          type: string
-          description: "Bisa berupa username atau email."
-          example: "johndoe"
-        password:
-          type: string
-          format: password
-          example: "Password123"
-
-    LoginSuccessResponse:
+            err: { type: string }
+            data: { nullable: true, example: null }
+    PaginationMeta:
       type: object
       properties:
-        status:
-          type: string
-          example: "success"
-        message:
-          type: string
-          example: "User Login Successful"
-        data:
-          type: object
-          properties:
-            token:
-              type: string
-              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        page: { type: integer, example: 1 }
+        limit: { type: integer, example: 10 }
+        total: { type: integer, example: 100 }
+        totalPages: { type: integer, example: 10 }
 
-    RefreshTokenSuccessResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          example: "success"
-        message:
-          type: string
-          example: "Token refreshed successfully"
-        data:
-          type: object
-          properties:
-            accessToken:
-              type: string
-              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new..."
-
-    # --- Location Schemas ---
     Province:
       type: object
       properties:
-        id:
-          type: integer
-          example: 11
-        name:
-          type: string
-          example: "ACEH"
+        province_id: { type: integer, example: 11 }
+        name: { type: string, example: ACEH }
     Regency:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1101
-        province_id:
-          type: integer
-          example: 11
-        name:
-          type: string
-          example: "KABUPATEN SIMEULUE"
-
-    # --- Report Schemas ---
-    ReportInput:
-      type: object
-      required:
-        - title
-        - description
-        - latitude
-        - longitude
-        - street
-        - provinceId
-        - regencyId
-        - photo
-      properties:
-        title:
-          type: string
-          example: "Jalan Rusak di Depan Balai Kota"
-        description:
-          type: string
-          example: "Terdapat lubang besar yang membahayakan pengendara."
-        latitude:
-          type: number
-          format: double
-          example: -6.2087634
-        longitude:
-          type: number
-          format: double
-          example: 106.845599
-        street:
-          type: string
-          example: "Jl. Medan Merdeka Sel. No.8-9, Gambir"
-        provinceId:
-          type: integer
-          example: 11
-        regencyId:
-          type: integer
-          example: 1171
-        photo:
-          type: string
-          format: binary
-          description: File gambar dari lokasi laporan.
-
-    VerifyReportInput:
-      type: object
-      required:
-        - verificationStatus
-      properties:
-        verificationStatus:
-          type: string
-          enum: [PENDING, VERIFIED, REJECTED]
-          example: VERIFIED
-        verificationNotes:
-          type: string
-          example: "Laporan telah divalidasi oleh tim lapangan."
-
-    ReportProgressInput:
-      type: object
-      required:
-        - progressNotes
-        - image
-      properties:
-        progressNotes:
-          type: string
-          example: "Pekerjaan perbaikan telah dimulai."
-        stage:
-          type: string
-          enum: [REVIEW, INPROGRESS, COMPLETED]
-          default: REVIEW
-          example: INPROGRESS
-        image:
-          type: string
-          format: binary
-          description: File gambar yang menunjukkan progres pengerjaan.
+        regency_id: { type: integer, example: 1101 }
+        province_id: { type: integer, example: 11 }
+        name: { type: string, example: KABUPATEN SIMEULUE }
 
     Address:
       type: object
       properties:
-        street:
-          type: string
-          example: "Jl. Gatot Subroto Kav. 52-53"
-        latitude:
-          type: number
-          example: -6.2293867
-        longitude:
-          type: number
-          example: 106.8093555
-        province_id:
-          type: integer
-          example: 11
-        regency_id:
-          type: integer
-          example: 1174
+        street: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        province: { $ref: '#/components/schemas/Province' }
+        regency: { $ref: '#/components/schemas/Regency' }
 
-    ReportDetail:
+    ReportCreateInput:
+      type: object
+      required: [title, description, latitude, longitude, street, provinceId, regencyId, photo]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        latitude: { type: number, format: double }
+        longitude: { type: number, format: double }
+        street: { type: string }
+        provinceId: { type: integer }
+        regencyId: { type: integer }
+        photo: { type: string, format: binary, description: Satu file gambar }
+
+    VerifyReportInput:
+      type: object
+      required: [verificationStatus]
+      properties:
+        verificationStatus:
+          type: string
+          enum: [PENDING, VERIFIED, REJECTED]
+        verificationNotes: { type: string, nullable: true }
+
+    ReportProgressInput:
+      type: object
+      required: [progressNotes, image]
+      properties:
+        progressNotes: { type: string }
+        stage:
+          type: string
+          enum: [REVIEW, INPROGRESS, COMPLETED]
+          default: REVIEW
+        image: { type: string, format: binary }
+
+    ReportListItem:
       type: object
       properties:
-        report_id:
-          type: integer
-          example: 1
-        title:
-          type: string
-          example: "Jalan Rusak"
-        description:
-          type: string
-          example: "Deskripsi jalan rusak."
-        address:
-          $ref: "#/components/schemas/Address"
-        photoUrl:
-          type: string
-          format: uri
-          example: "http://res.cloudinary.com/demo/image/upload/sample.jpg"
+        report_id: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        photoUrl: { type: string, format: uri }
         verification_status:
           type: string
           enum: [PENDING, VERIFIED, REJECTED]
-          example: "PENDING"
-        verification_notes:
-          type: string
-          nullable: true
-          example: "Sedang dalam proses pengecekan awal."
+        verification_notes: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        author:
+          type: object
+          properties:
+            username: { type: string }
+        address: { $ref: '#/components/schemas/Address' }
+        _count:
+          type: object
+          properties:
+            progressUpdates: { type: integer }
 
-# API Paths
-paths:
-  # --- Auth Paths ---
-  /user/register:
-    post:
-      tags:
-        - Auth
-      summary: Registrasi Pengguna Baru
-      description: Mendaftarkan pengguna baru ke dalam sistem.
-      operationId: userRegister
-      requestBody:
-        description: Data yang diperlukan untuk registrasi pengguna.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserRegisterInput"
-      responses:
-        "201":
-          description: Registrasi berhasil.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
-                  - type: object
-                    properties:
-                      message:
-                        example: "User Registration Successful"
-                      data:
-                        example: "User registered successfully."
-        "409":
-          description: Gagal registrasi karena username atau email sudah digunakan.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                userExists:
-                  value:
-                    status: "fail"
-                    message: "User Registration Failed"
-                    data:
-                      err: "Email is already in use."
-                      data: null
-        "422":
-          description: Payload tidak valid atau field yang wajib tidak diisi. Error ini berasal dari validasi Joi.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                invalidPayload:
-                  value:
-                    status: "fail"
-                    message: "Invalid Payload"
-                    data:
-                      err: "Username wajib diisi."
-                      data: null
-                invalidPassword:
-                  value:
-                    status: "fail"
-                    message: "Invalid Payload"
-                    data:
-                      err: "Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka."
-                      data: null
-        "500":
-          description: Kesalahan Internal Server.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
-  /user/login:
-    post:
-      tags:
-        - Auth
-      summary: Login Pengguna
-      description: Mengotentikasi pengguna dan mengembalikan token JWT jika berhasil. Refresh token akan disimpan dalam httpOnly cookie.
-      operationId: userLogin
-      requestBody:
-        description: Kredensial pengguna untuk login.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserLoginInput"
-      responses:
-        "200":
-          description: Login berhasil, access token dikembalikan.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoginSuccessResponse"
-        "401":
-          description: Gagal otentikasi (password salah).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                wrongPassword:
-                  value:
-                    status: "fail"
-                    message: "User Login Failed"
-                    data:
-                      err: "Incorrect password."
-                      data: null
-        "404":
-          description: Pengguna tidak ditemukan.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                notFound:
-                  value:
-                    status: "fail"
-                    message: "User Login Failed"
-                    data:
-                      err: "User not found."
-                      data: null
-        "422":
-          description: Payload tidak valid (field kosong).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                invalidPayload:
-                  value:
-                    status: "fail"
-                    message: "Invalid Payload"
-                    data:
-                      err: "Harap isi Password"
-                      data: null
-        "500":
-          description: Kesalahan Internal Server.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
-  /user/refresh-token:
-    post:
-      tags:
-        - Auth
-      summary: Perbarui Access Token
-      description: Menggunakan refresh token yang tersimpan di cookie untuk mendapatkan access token baru.
-      operationId: refreshToken
-      responses:
-        "200":
-          description: Access token berhasil diperbarui.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RefreshTokenSuccessResponse"
-        "401":
-          description: Gagal memperbarui token. Bisa karena refresh token tidak ada, tidak valid, atau sudah tidak aktif.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                noToken:
-                  value:
-                    status: "fail"
-                    message: "Unauthorized"
-                    data:
-                      err: "Refresh token is required"
-                      data: null
-                inactiveToken:
-                  value:
-                    status: "fail"
-                    message: "Failed to refresh token"
-                    data:
-                      err: "Token is valid, but no longer active. Please log in again."
-                      data: null
-        "500":
-          description: Kesalahan Internal Server.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
-  /user/logout:
-    post:
-      tags:
-        - Auth
-      summary: Logout Pengguna
-      description: Menghapus refresh token dari database dan cookie, secara efektif mengakhiri sesi pengguna.
-      operationId: userLogout
-      responses:
-        "200":
-          description: Logout berhasil.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
-                  - type: object
-                    properties:
-                      message:
-                        example: "Logged out successfully"
-                      data:
-                        example: "Logout successful."
-        "401":
-          description: Gagal logout, biasanya karena pengguna sudah tidak dalam sesi (tidak ada refresh token).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "500":
-          description: Kesalahan Internal Server.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
-  # --- Location Paths ---
-  /provinces:
-    get:
-      tags:
-        - Location
-      summary: Dapatkan semua provinsi
-      description: Mengambil daftar semua provinsi di Indonesia.
-      operationId: getAllProvinces
-      responses:
-        "200":
-          description: Berhasil mengambil daftar provinsi.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Province"
-  /regencies:
-    get:
-      tags:
-        - Location
-      summary: Dapatkan semua kabupaten/kota
-      description: Mengambil daftar semua kabupaten/kota di Indonesia.
-      operationId: getAllRegencies
-      responses:
-        "200":
-          description: Berhasil mengambil daftar kabupaten/kota.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Regency"
-  /provinces/{provinceId}/regencies:
-    get:
-      tags:
-        - Location
-      summary: Dapatkan kabupaten/kota berdasarkan ID provinsi
-      description: Mengambil daftar kabupaten/kota untuk provinsi tertentu.
-      operationId: getRegenciesByProvinceId
-      parameters:
-        - name: provinceId
-          in: path
-          required: true
-          description: ID dari provinsi.
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Berhasil mengambil daftar kabupaten/kota.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Regency"
-        "404":
-          description: Provinsi dengan ID yang diberikan tidak ditemukan.
-
-  # --- Report Paths ---
-  /report:
-    get:
-      tags:
-        - Report
-      summary: Dapatkan semua laporan
-      description: Mengambil daftar semua laporan yang telah dikirim. Memerlukan otentikasi.
-      operationId: getAllReport
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Berhasil mengambil semua laporan.
-          content:
-            application/json:
-              schema:
+    ReportDetail:
+      allOf:
+        - $ref: '#/components/schemas/ReportListItem'
+        - type: object
+          properties:
+            progressUpdates:
+              type: array
+              items:
                 type: object
                 properties:
-                  status: { type: string, example: "success" }
-                  message:
-                    { type: string, example: "Berhasil mendapatkan laporan" }
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ReportDetail"
-        "401":
-          description: Tidak terotentikasi. Token JWT tidak ada atau tidak valid.
-        "404":
-          description: Gagal mendapatkan laporan (tidak ada laporan yang ditemukan).
-        "500":
-          description: Kesalahan Internal Server.
+                  report_progress_id: { type: integer }
+                  progress_notes: { type: string }
+                  stage:
+                    type: string
+                    enum: [REVIEW, INPROGRESS, COMPLETED]
+                  photo_url: { type: string, format: uri }
+                  createdAt: { type: string, format: date-time }
+
+paths:
+  /user/register:
     post:
-      tags:
-        - Report
-      summary: Tambah laporan baru
-      description: Membuat laporan baru dengan detail lokasi dan gambar. Memerlukan otentikasi.
-      operationId: addReport
-      security:
-        - BearerAuth: []
+      tags: [Auth]
+      summary: Registrasi pengguna baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserRegisterInput' }
+      responses:
+        '201': { description: Berhasil, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '409': { description: Conflict, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '422': { description: Invalid payload, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+  /user/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserLoginInput' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '401': { description: Unauthorized, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        '404': { description: Not Found, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+  /user/refreshToken:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '401': { description: Unauthorized }
+  /user/logout:
+    post:
+      tags: [Auth]
+      summary: Logout
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+
+  /user/{userId}:
+    get:
+      tags: [User]
+      summary: Dapatkan user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '404': { description: Tidak ditemukan }
+
+  /provinces:
+    get:
+      tags: [Location]
+      summary: Semua provinsi
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Province' }
+  /regencies:
+    get:
+      tags: [Location]
+      summary: Semua kabupaten/kota
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Regency' }
+  /provinces/{id}/regencies:
+    get:
+      tags: [Location]
+      summary: Kabupaten/kota per provinsi
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Regency' }
+
+  /report:
+    post:
+      tags: [Report]
+      summary: Tambah laporan baru (upload 1 foto)
+      security: [{ BearerAuth: [] }]
       requestBody:
         required: true
         content:
           multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/ReportInput"
+            schema: { $ref: '#/components/schemas/ReportCreateInput' }
       responses:
-        "201":
-          description: Laporan berhasil dibuat.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "400":
-          description: Permintaan tidak valid, misalnya file gambar tidak disertakan.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                noFile:
-                  value:
-                    status: "fail"
-                    message: "Bad Request"
-                    data:
-                      err: "File gambar diperlukan"
-                      data: null
-        "401":
-          description: Tidak terotentikasi. Token JWT tidak ada atau tidak valid.
-        "404":
-          description: Pengguna (author) yang membuat laporan tidak ditemukan.
-        "422":
-          description: Payload tidak valid berdasarkan validasi Joi.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                invalidPayload:
-                  value:
-                    status: "fail"
-                    message: "Invalid Payload"
-                    data:
-                      err: "Judul wajib diisi."
-                      data: null
-        "500":
-          description: Kesalahan Internal Server, bisa terjadi saat upload gambar gagal.
-
-  /report/{reportId}:
-    get:
-      tags:
-        - Report
-      summary: Dapatkan detail laporan berdasarkan ID
-      description: Mengambil detail lengkap dari satu laporan spesifik. Memerlukan otentikasi.
-      operationId: getReportById
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: reportId
-          in: path
-          required: true
-          description: ID unik dari laporan.
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Berhasil mendapatkan detail laporan.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status: { type: string, example: "success" }
-                  message:
-                    { type: string, example: "Berhasil mendapatkan laporan" }
-                  data:
-                    $ref: "#/components/schemas/ReportDetail"
-        "401":
-          description: Tidak terotentikasi. Token JWT tidak ada atau tidak valid.
-        "404":
-          description: Laporan dengan ID yang diberikan tidak ditemukan.
-        "500":
-          description: Kesalahan Internal Server.
-
-  /report/{reportId}/verify:
-    patch:
-      tags:
-        - Report
-      summary: Verifikasi atau tolak laporan
-      description: Memperbarui status verifikasi dari laporan tertentu. Memerlukan otentikasi dan hak akses (misalnya admin).
-      operationId: verifyReport
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: reportId
-          in: path
-          required: true
-          description: ID dari laporan yang akan diverifikasi.
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/VerifyReportInput"
-      responses:
-        "200":
-          description: Verifikasi laporan berhasil diperbarui.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
-          description: Tidak terotentikasi.
-        "403":
-          description: Tidak memiliki hak akses untuk memverifikasi laporan.
-        "404":
-          description: Gagal memverifikasi laporan (laporan tidak ditemukan).
-        "422":
-          description: Payload tidak valid.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                invalidPayload:
-                  value:
-                    status: "fail"
-                    message: "Invalid Payload"
-                    data:
-                      err: "Status verifikasi wajib diisi."
-                      data: null
-        "500":
-          description: Kesalahan Internal Server.
+        '201': { description: Dibuat, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '400': { description: Bad Request }
+        '401': { description: Unauthorized }
+        '422': { description: Invalid payload }
 
   /report/{reportId}/progress:
     post:
-      tags:
-        - Report
-      summary: Tambah progres pengerjaan laporan
-      description: Menambahkan catatan dan gambar progres untuk sebuah laporan. Memerlukan otentikasi dan hak akses.
-      operationId: addReportProgress
-      security:
-        - BearerAuth: []
+      tags: [Report]
+      summary: Tambah progres (upload 1 foto)
+      security: [{ BearerAuth: [] }]
       parameters:
         - name: reportId
           in: path
           required: true
-          description: ID unik dari laporan yang akan diupdate.
-          schema:
-            type: integer
+          schema: { type: integer }
       requestBody:
         required: true
         content:
           multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/ReportProgressInput"
+            schema: { $ref: '#/components/schemas/ReportProgressInput' }
       responses:
-        "201":
-          description: Progres laporan berhasil ditambahkan.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "400":
-          description: Permintaan tidak valid, misalnya file gambar tidak disertakan.
-        "401":
-          description: Tidak terotentikasi.
-        "403":
-          description: Tidak memiliki hak akses untuk menambah progres.
-        "404":
-          description: Laporan atau pengguna (reviewer) tidak ditemukan.
-        "422":
-          description: Payload tidak valid (misalnya, progressNotes terlalu pendek).
-        "500":
-          description: Kesalahan Internal Server.
+        '201': { description: Dibuat, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '400': { description: Bad Request }
+        '401': { description: Unauthorized }
+        '404': { description: Not Found }
 
   /report/province/{provinceId}:
     get:
-      tags:
-        - Report
-      summary: Dapatkan laporan berdasarkan provinsi
-      description: Mengambil daftar semua laporan untuk provinsi tertentu. Memerlukan otentikasi.
-      operationId: getAllReportsByProvince
-      security:
-        - BearerAuth: []
+      tags: [Report]
+      summary: Laporan per provinsi
       parameters:
         - name: provinceId
           in: path
           required: true
-          description: ID dari provinsi untuk filter laporan.
-          schema:
-            type: integer
+          schema: { type: integer }
       responses:
-        "200":
-          description: Berhasil mengambil laporan untuk provinsi tersebut.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status: { type: string, example: "success" }
-                  message:
-                    {
-                      type: string,
-                      example: "Berhasil mendapatkan laporan berdasarkan provinsi",
-                    }
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/ReportDetail"
-        "401":
-          description: Tidak terotentikasi. Token JWT tidak ada atau tidak valid.
-        "404":
-          description: Tidak ada laporan yang ditemukan untuk provinsi ini.
-        "500":
-          description: Kesalahan Internal Server.
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/SuccessResponse' } } } }
+        '404': { description: Not Found }
