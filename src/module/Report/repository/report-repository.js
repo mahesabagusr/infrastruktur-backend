@@ -48,7 +48,7 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports({ offset, limit, stage, status, username, signature }) {
+  static async findAllReports({ offset, limit, stage, status, userId }) {
     const where = {};
 
     if (stage) {
@@ -57,12 +57,8 @@ export default class ReportRepository {
     if (status) {
       where.verification_status = status;
     }
-    if (username && signature) {
-      where.author = {
-        AND: [
-          { username: { contains: username, mode: 'insensitive' } },
-          { signature: { contains: signature, mode: 'insensitive' } }]
-      }
+    if (userId) {
+      where.author_id = parseInt(userId);
     }
 
     return prisma.report.findMany({
@@ -106,7 +102,7 @@ export default class ReportRepository {
     });
   }
 
-  static async countAllReports({ stage, status, username, signature }) {
+  static async countAllReports({ stage, status, userId }) {
     const where = {};
 
     if (stage) {
@@ -115,12 +111,8 @@ export default class ReportRepository {
     if (status) {
       where.verification_status = status;
     }
-    if (username && signature) {
-      where.author = {
-        AND: [
-          { username: { contains: username, mode: 'insensitive' } },
-          { signature: { contains: signature, mode: 'insensitive' } }]
-      }
+    if (userId) {
+      where.author_id = parseInt(userId);
     }
 
     return prisma.report.count({ where });

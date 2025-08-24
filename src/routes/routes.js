@@ -14,9 +14,9 @@ router.get('/', function (req, res) {
 
 router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
-router.post('/user/refreshToken', refreshToken)
-router.post('/user/logout', userLogout)
-router.get('/user/:userId', getUserById)
+router.post('/user/refreshToken', verifyReport, refreshToken)
+router.post('/user/logout', verifyReport, userLogout)
+router.get('/user/:userId', verifyToken, getUserById)
 router.get('/user', verifyToken, getUser)
 
 
