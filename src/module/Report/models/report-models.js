@@ -69,7 +69,7 @@ const verifyReportModel = joi.object({
   }),
 })
 
-const getAllReportByProgressModel = joi.object({
+const getAllReportModel = joi.object({
   page: joi.number().integer().min(1).default(1).messages({
     'number.base': 'Halaman harus berupa angka.',
     'number.integer': 'Halaman harus berupa bilangan bulat.',
@@ -89,14 +89,11 @@ const getAllReportByProgressModel = joi.object({
     'string.base': 'Stage harus berupa teks.',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
   }),
-  username: joi.string().optional().messages({
-    'string.base': 'Username harus berupa teks.',
+  userId: joi.number().integer().positive().optional().messages({
+    'number.base': 'User ID harus berupa angka.',
+    'number.integer': 'User ID harus berupa bilangan bulat.',
+    'number.positive': 'User ID harus berupa angka positif.',
   }),
-  signature: joi.string().optional().messages({
-    'string.base': 'Signature harus berupa teks.',
-  }),
-}).and('username', 'signature').messages({
-  'object.and': 'Jika ingin mencari berdasarkan username atau signature, keduanya harus diisi bersamaan.',
 });
 
 const createReportProgressSchema = joi.object({
@@ -113,4 +110,4 @@ const createReportProgressSchema = joi.object({
 
 });
 
-export { reportModel, createReportProgressSchema, verifyReportModel, getAllReportByProgressModel };
+export { reportModel, createReportProgressSchema, verifyReportModel, getAllReportModel };
