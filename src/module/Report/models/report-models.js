@@ -110,9 +110,7 @@ const createReportProgressSchema = joi.object({
     'string.base': 'Stage harus berupa teks',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,
   }),
-  photo: joi.any().required().messages({
-    'any.required': 'Foto wajib diunggah.',
-  }),
+
 });
 
 export { reportModel, createReportProgressSchema, verifyReportModel, getAllReportByProgressModel };

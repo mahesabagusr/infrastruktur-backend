@@ -14,10 +14,16 @@ export default class ReportService {
         return wrapper.error(new BadRequestError("User tidak ditemukan"));
       }
 
-      const uploadResult = await uploadToCloudinary(image);
-      if (!uploadResult) {
+      if (!image) {
+        return wrapper.error(new BadRequestError("Foto laporan wajib diunggah."));
+      }
+
+      // Use the single uploader utility
+      const uploadResult = await uploadToCloudinary(image, { folder: "reports" });
+      if (!uploadResult || !uploadResult.secure_url) {
         return wrapper.error(new BadRequestError("Image upload failed"));
       }
+
       const imageUrl = uploadResult.secure_url;
 
       const newReport = await ReportRepository.createReport({
@@ -56,14 +62,6 @@ export default class ReportService {
   static async addReportProgress(payload) {
     try {
       const { progressNotes: progress_notes, stage, email, image, reportId } = payload;
-
-      const report = await ReportRepository.findReportById(reportId);
-      if (!report || report.verification_status !== 'verified') {
-        const err = !report
-          ? new NotFoundError("Laporan tidak ditemukan")
-          : new BadRequestError("Laporan harus diverifikasi sebelum menambahkan progres");
-        return wrapper.error(err);
-      }
 
       const author = await UserRepository.findUserByEmailOrUsername(email);
       if (!author) {
@@ -137,6 +135,17 @@ export default class ReportService {
     }
   }
 
+  static getReportProgressById = async (progressId) => {
+    try {
+      const progress = await ReportRepository.findReportProgressById(progressId);
+      if (!progress) {
+        return wrapper.error(new NotFoundError("Progress laporan tidak ditemukan"));
+      }
+      return wrapper.data(progress);
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
 
 
 }
