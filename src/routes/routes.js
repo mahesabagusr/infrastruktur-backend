@@ -4,7 +4,7 @@ import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/m
 import { addReport, addReportProgress, getAllReport, getAllReportsByProvince, verifyReport, getReportProgressById } from '@/module/Report/controllers/report-controllers.js';
 import { verifyToken } from '@/middlewares/jwt-auth.js';
 import { basicAuth } from '@/middlewares/basic-auth.js';
-import upload from '@/helpers/utils/multer.js';
+import { acceptImageFields, normalizeSingleFile } from '@/helpers/utils/multer.js';
 
 const router = express.Router();
 
@@ -14,8 +14,8 @@ router.get('/', function (req, res) {
 
 router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
-router.post('/user/refreshToken', verifyReport, refreshToken)
-router.post('/user/logout', verifyReport, userLogout)
+router.post('/user/refreshToken', verifyToken, refreshToken)
+router.post('/user/logout', verifyToken, userLogout)
 router.get('/user/:userId', verifyToken, getUserById)
 router.get('/user', verifyToken, getUser)
 
@@ -25,12 +25,13 @@ router.get('/regencies', getAllRegencies);
 router.get('/provinces/:id/regencies', getRegenciesByProvincesId);
 
 
-router.post('/report', verifyToken, upload.single('photo'), addReport);
-router.post('/report/:reportId/progress', verifyToken, basicAuth, upload.single('photo'), addReportProgress);
+
+router.post('/report', verifyToken, acceptImageFields, normalizeSingleFile, addReport);
+router.post('/report/:reportId/progress', verifyToken, basicAuth, acceptImageFields, normalizeSingleFile, addReportProgress);
 router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
 router.get('/report', getAllReport)
-router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProgressById);
+router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 
 
 export default router;
