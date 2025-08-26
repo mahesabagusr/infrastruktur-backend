@@ -4,7 +4,7 @@ import {
   SUCCESS as http,
 } from '@/helpers/http-status/status_code.js'
 import { isValidPayload } from '@/helpers/utils/validator.js';
-import { createReportProgressSchema, reportModel, verifyReportModel, getAllReportByProgressModel } from '@/module/Report/models/report-models.js';
+import { createReportProgressSchema, reportModel, verifyReportModel, getAllReportModel } from '@/module/Report/models/report-models.js';
 import ReportService from '@/module/Report/services/report-services.js';
 import logger from '@/helpers/utils/logger.js';
 import { BadRequestError } from '@/helpers/error/index.js';
@@ -168,7 +168,7 @@ const addReportProgress = async (req, res) => {
 
 const getAllReport = async (req, res) => {
   try {
-    const validatePayload = isValidPayload(req.query, getAllReportByProgressModel);
+    const validatePayload = isValidPayload(req.query, getAllReportModel);
 
     if (validatePayload.err) {
       return wrapper.response(

@@ -205,6 +205,40 @@ const userLogout = async (req, res) => {
   }
 }
 
+const getUser = async (req, res) => {
+  try {
+    const result = await UserService.getUser();
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal mendapatkan user",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil mendapatkan user",
+      http.OK
+    );
+
+  } catch (err) {
+    logger.error(`Unexpected error during getUser: ${err.message}`);
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
 const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -240,4 +274,4 @@ const getUserById = async (req, res) => {
   }
 }
 
-export { userRegister, userLogin, refreshToken, userLogout, getUserById };
+export { userRegister, userLogin, refreshToken, userLogout, getUserById, getUser };

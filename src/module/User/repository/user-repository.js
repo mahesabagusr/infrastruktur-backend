@@ -106,4 +106,34 @@ export default class UserRepository {
       }
     });
   }
+
+  static async findAllUsers() {
+    return prisma.user.findMany({
+      select: {
+        user_id: true,
+        username: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+        phone_number: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        address: {
+          select: {
+            street: true,
+            latitude: true,
+            longitude: true,
+            province: { select: { province_id: true, name: true } },
+            regency: { select: { regency_id: true, name: true } },
+          }
+        },
+        _count: {
+          select: {
+            reports: true,
+          }
+        },
+      }
+    })
+  }
 }
