@@ -44,6 +44,8 @@ model user {
   address         address?
   reports         report[]          @relation("UserReports")
   verifiedReports report[]          @relation("VerifierReports")
+  likes           like[]            @relation("UserLikes")
+  comments        comment[]         @relation("UserComments")
   reviews         report_progress[]
   refreshTokens   refresh_token[]
 
@@ -80,6 +82,10 @@ model report {
   verifier    user? @relation("VerifierReports", fields: [verifier_id], references: [user_id])
   verifier_id Int?
 
+  likes       like[] @relation("ReportLikes")
+  likes_id    Int?
+  comments    comment[] @relation("ReportComments")
+  comments_id Int?
   progressUpdates report_progress[]
 
   @@index([author_id])
@@ -144,5 +150,36 @@ model regency {
   addresses address[]
 
   @@index([province_id])
+}
+
+model like {
+  like_id        Int      @id @default(autoincrement())
+
+  user   user   @relation("UserLikes", fields: [user_id], references: [user_id], onDelete: Cascade)
+  report report @relation("ReportLikes", fields: [report_id], references: [report_id], onDelete: Cascade)
+  user_id   Int
+  report_id Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([user_id, report_id])
+  @@index([user_id])
+  @@index([report_id])
+}
+
+model comment {
+  comment_id Int      @id @default(autoincrement())
+  content    String   @db.Text
+
+  user   user   @relation("UserComments", fields: [user_id], references: [user_id], onDelete: Cascade)
+  user_id Int
+
+  report report @relation("ReportComments", fields: [report_id], references: [report_id], onDelete: Cascade)
+  report_id Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([user_id])
+  @@index([report_id])
 }
 
