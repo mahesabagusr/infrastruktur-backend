@@ -50,15 +50,15 @@ const registerModel = joi.object().keys({
     'string.pattern.base': 'Format nomor telepon yang Anda masukkan tidak valid.',
   }),
   provinceId: joi.number().integer().required().positive().required().messages({
-    'number.base': 'ID Provinsi harus berupa angka.',
-    'number.integer': 'ID Provinsi harus berupa bilangan bulat.',
-    'number.positive': 'ID Provinsi harus berupa angka positif.',
+    // 'number.base': 'ID Provinsi harus berupa angka.',
+    // 'number.integer': 'ID Provinsi harus berupa bilangan bulat.',
+    // 'number.positive': 'ID Provinsi harus berupa angka positif.',
     'any.required': 'Provinsi wajib dipilih.',
   }),
   regencyId: joi.number().integer().required().positive().required().messages({
-    'number.base': 'ID Kabupaten/Kota harus berupa angka.',
-    'number.integer': 'ID Kabupaten/Kota harus berupa bilangan bulat.',
-    'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',
+    // 'number.base': 'ID Kabupaten/Kota harus berupa angka.',
+    // 'number.integer': 'ID Kabupaten/Kota harus berupa bilangan bulat.',
+    // 'number.positive': 'ID Kabupaten/Kota harus berupa angka positif.',
     'any.required': 'Kabupaten/Kota wajib dipilih.',
   }),
 });
