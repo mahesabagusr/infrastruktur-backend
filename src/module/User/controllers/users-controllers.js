@@ -99,10 +99,11 @@ const userLogin = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      secure: false,
+      sameSite: 'Lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+
     console.log(result);
     return wrapper.response(
       res,
@@ -149,7 +150,8 @@ const refreshToken = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
+      sameSite: 'Lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
