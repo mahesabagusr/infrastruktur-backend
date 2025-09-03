@@ -19,17 +19,14 @@ router.post('/user/logout', verifyToken, userLogout)
 router.get('/user/:userId', verifyToken, getUserById)
 router.get('/user', verifyToken, getUser)
 
-
 router.get('/provinces', getAllProvinces);
 router.get('/regencies', getAllRegencies);
 router.get('/provinces/:id/regencies', getRegenciesByProvincesId);
 
-
-
 router.post('/report', verifyToken, acceptImageFields, normalizeSingleFile, addReport);
 router.post('/report/:reportId/progress', verifyToken, basicAuth, acceptImageFields, normalizeSingleFile, addReportProgress);
 router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
-router.get('/report', getAllReport)
+router.get('/report', getAllReport);
 router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProgressById);
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 
