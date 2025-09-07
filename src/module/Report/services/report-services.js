@@ -18,7 +18,6 @@ export default class ReportService {
         return wrapper.error(new BadRequestError("Foto laporan wajib diunggah."));
       }
 
-      // Use the single uploader utility
       const uploadResult = await uploadToCloudinary(image, { folder: "reports" });
       if (!uploadResult || !uploadResult.secure_url) {
         return wrapper.error(new BadRequestError("Image upload failed"));
@@ -93,11 +92,11 @@ export default class ReportService {
 
   static getAllReport = async (query) => {
     try {
-      const { page = 1, limit = 10, stage, status, userId } = query;
+      const { page = 1, limit = 10, stage, status, userId, provinceId, regencyId } = query;
       const offset = (page - 1) * limit;
 
-      const reports = await ReportRepository.findAllReports({ offset, limit, stage, status, userId });
-      const total = await ReportRepository.countAllReports({ stage, status, userId });
+      const reports = await ReportRepository.findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId });
+      const total = await ReportRepository.countAllReports({ stage, status, userId, provinceId, regencyId });
 
       if (!reports || reports.length === 0) {
         return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
