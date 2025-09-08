@@ -1,10 +1,11 @@
 import { PrismaClient } from 'generated/prisma/index.js';
+import logger from '@/helpers/utils/logger.js';
 import { provincesData, regenciesData } from './constants.js';
 
 const prisma = new PrismaClient();
 
 async function upsertProvinces() {
-  console.log('Upserting provinces...');
+  logger.info('Upserting provinces...');
   for (const p of provincesData) {
     const province_id = parseInt(p.province_id, 10);
     await prisma.province.upsert({
@@ -16,7 +17,7 @@ async function upsertProvinces() {
 }
 
 async function upsertRegencies() {
-  console.log('Upserting regencies...');
+  logger.info('Upserting regencies...');
   const batchSize = 200;
   for (let i = 0; i < regenciesData.length; i += batchSize) {
     const batch = regenciesData.slice(i, i + batchSize);
@@ -45,28 +46,28 @@ async function main() {
   const regenciesComplete = regencyCount >= regenciesData.length;
 
   if (provincesComplete && regenciesComplete) {
-    console.log('Seed skipped: provinces and regencies already exist.');
+    logger.info('Seed skipped: provinces and regencies already exist.');
     return;
   }
 
   if (!provincesComplete) {
     await upsertProvinces();
   } else {
-    console.log('Provinces already complete, skipping.');
+    logger.info('Provinces already complete, skipping.');
   }
 
   if (!regenciesComplete) {
     await upsertRegencies();
   } else {
-    console.log('Regencies already complete, skipping.');
+    logger.info('Regencies already complete, skipping.');
   }
 
-  console.log('Seeding selesai');
+  logger.info('Seeding selesai');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    logger.error(e);
     process.exit(1);
   })
   .finally(async () => {
