@@ -30,6 +30,5 @@ router.get('/report', getAllReport);
 router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProgressById);
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 router.get('/report/:reportId', verifyToken, getReportById);
-
-
+  
 export default router;
