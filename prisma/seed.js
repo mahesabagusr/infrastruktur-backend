@@ -1,44 +1,73 @@
 import { PrismaClient } from 'generated/prisma/index.js';
+import logger from '@/helpers/utils/logger.js';
 import { provincesData, regenciesData } from './constants.js';
+
 const prisma = new PrismaClient();
 
-async function main() {
-  console.log('Menghapus data lama...');
-  await prisma.province.deleteMany();
-  await prisma.regency.deleteMany();
-
-  console.log('Data lama berhasil dihapus.');
-
-  console.log('Menambahkan data provinsi...');
-  await prisma.province.createMany({
-    data: provincesData.map(province => ({
-      province_id: parseInt(province.province_id, 10),
-      name: province.name,
-    })),
-  });
-
-  console.log('Data provinsi berhasil ditambahkan.');
-
-  console.log('Menambahkan data kabupaten/kota...');
-
-  const batchSize = 100;
-  for (let i = 0; i < regenciesData.length; i += batchSize) {
-    const batch = regenciesData.slice(i, i + batchSize);
-    await prisma.regency.createMany({
-      data: batch.map(regency => ({
-        regency_id: parseInt(regency.regency_id, 10),
-        name: regency.name,
-        province_id: parseInt(regency.province_id, 10),
-      })),
+async function upsertProvinces() {
+  logger.info('Upserting provinces...');
+  for (const p of provincesData) {
+    const province_id = parseInt(p.province_id, 10);
+    await prisma.province.upsert({
+      where: { province_id },
+      update: { name: p.name },
+      create: { province_id, name: p.name },
     });
   }
+}
 
-  console.log('Seeding selesai');
+async function upsertRegencies() {
+  logger.info('Upserting regencies...');
+  const batchSize = 200;
+  for (let i = 0; i < regenciesData.length; i += batchSize) {
+    const batch = regenciesData.slice(i, i + batchSize);
+    await prisma.$transaction(
+      batch.map((r) => {
+        const regency_id = parseInt(r.regency_id, 10);
+        const province_id = parseInt(r.province_id, 10);
+        return prisma.regency.upsert({
+          where: { regency_id },
+          update: { name: r.name, province_id },
+          create: { regency_id, name: r.name, province_id },
+        });
+      })
+    );
+  }
+}
+
+async function main() {
+  // Never delete; avoid cascading address deletions
+  const [provinceCount, regencyCount] = await Promise.all([
+    prisma.province.count(),
+    prisma.regency.count(),
+  ]);
+
+  const provincesComplete = provinceCount >= provincesData.length;
+  const regenciesComplete = regencyCount >= regenciesData.length;
+
+  if (provincesComplete && regenciesComplete) {
+    logger.info('Seed skipped: provinces and regencies already exist.');
+    return;
+  }
+
+  if (!provincesComplete) {
+    await upsertProvinces();
+  } else {
+    logger.info('Provinces already complete, skipping.');
+  }
+
+  if (!regenciesComplete) {
+    await upsertRegencies();
+  } else {
+    logger.info('Regencies already complete, skipping.');
+  }
+
+  logger.info('Seeding selesai');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    logger.error(e);
     process.exit(1);
   })
   .finally(async () => {

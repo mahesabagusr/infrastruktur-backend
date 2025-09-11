@@ -47,7 +47,7 @@ export default class ReportRepository {
       }
     });
   }
-
+  
   static async findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId }) {
     const where = {};
 

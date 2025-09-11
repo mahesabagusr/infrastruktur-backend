@@ -7,6 +7,7 @@ import cors from 'cors'
 
 import fs from 'fs';
 import YAML from 'js-yaml';
+import logger from '@/helpers/utils/logger.js';
 
 const swaggerDocument = YAML.load(fs.readFileSync('./docs/docs.yaml', 'utf8'));
 const app = express();
@@ -24,12 +25,27 @@ app.options('*', cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    logger.info({
+      msg: 'HTTP',
+      method: req.method,
+      url: req.originalUrl,
+      status: res.statusCode,
+      duration,
+    });
+  });
+  next();
+});
 app.use(router);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const port = config.port || 8080;
 
 app.listen(port, () => {
-  console.log(`Server started at http://localhost:${port}`);
+  logger.info(`Server started at http://localhost:${port}`);
 });
 
