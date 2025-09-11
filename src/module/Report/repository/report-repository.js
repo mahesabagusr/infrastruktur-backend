@@ -47,8 +47,8 @@ export default class ReportRepository {
       }
     });
   }
-
-  static async findAllReports({ offset, limit, stage, status, userId }) {
+  
+  static async findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId }) {
     const where = {};
 
     if (stage) {
@@ -59,6 +59,12 @@ export default class ReportRepository {
     }
     if (userId) {
       where.author_id = parseInt(userId);
+    }
+
+    if (provinceId || regencyId) {
+      where.address = {};
+      if (provinceId) where.address.province_id = parseInt(provinceId);
+      if (regencyId) where.address.regency_id = parseInt(regencyId);
     }
 
     return prisma.report.findMany({
@@ -78,7 +84,7 @@ export default class ReportRepository {
           select: {
             street: true,
             province: { select: { name: true, province_id: true } },
-            regency: { select: { name: true, province_id: true } },
+            regency: { select: { name: true, regency_id: true } },
           }
         },
         _count: { select: { progressUpdates: true } },
@@ -102,7 +108,7 @@ export default class ReportRepository {
     });
   }
 
-  static async countAllReports({ stage, status, userId }) {
+  static async countAllReports({ stage, status, userId, provinceId, regencyId }) {
     const where = {};
 
     if (stage) {
@@ -113,6 +119,12 @@ export default class ReportRepository {
     }
     if (userId) {
       where.author_id = parseInt(userId);
+    }
+
+    if (provinceId || regencyId) {
+      where.address = {};
+      if (provinceId) where.address.province_id = parseInt(provinceId);
+      if (regencyId) where.address.regency_id = parseInt(regencyId);
     }
 
     return prisma.report.count({ where });

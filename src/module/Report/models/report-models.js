@@ -94,6 +94,16 @@ const getAllReportModel = joi.object({
     'number.integer': 'User ID harus berupa bilangan bulat.',
     'number.positive': 'User ID harus berupa angka positif.',
   }),
+  provinceId: joi.number().integer().positive().optional().messages({
+    'number.base': 'Provinsi ID harus berupa angka.',
+    'number.integer': 'Provinsi ID harus berupa bilangan bulat.',
+    'number.positive': 'Provinsi ID harus berupa angka positif.',
+  }),
+  regencyId: joi.number().integer().positive().optional().messages({
+    'number.base': 'Kabupaten/Kota ID harus berupa angka.',
+    'number.integer': 'Kabupaten/Kota ID harus berupa bilangan bulat.',
+    'number.positive': 'Kabupaten/Kota ID harus berupa angka positif.',
+  }),
 });
 
 const createReportProgressSchema = joi.object({
