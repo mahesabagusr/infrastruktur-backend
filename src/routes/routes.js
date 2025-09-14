@@ -5,8 +5,8 @@ import { addReport, addReportProgress, getAllReport, getAllReportsByProvince, ve
 import { verifyToken } from '@/middlewares/jwt-auth.js';
 import { basicAuth } from '@/middlewares/basic-auth.js';
 import { acceptImageFields, normalizeSingleFile } from '@/helpers/utils/multer.js';
-import { createLike, deleteLike } from '@/module/Likes/like.controller';
-import { createComment, deleteComment } from '@/module/comments/comment.controller';
+import { createLike, deleteLike } from '@/module/Likes/like.controller.js';
+import { createComment, deleteComment } from '@/module/comments/comment.controller.js';
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.get('/', function (req, res) {
 
 router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
-router.post('/user/refreshToken', verifyToken, refreshToken)
+router.post('/user/refreshToken', refreshToken)
 router.post('/user/logout', verifyToken, userLogout)
 router.get('/user/:userId', verifyToken, getUserById)
 router.get('/user', verifyToken, getUser)
@@ -36,10 +36,10 @@ router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProg
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 
 
-router.post('/like', verifyToken, createLike);
-router.delete('/like/:id', verifyToken, deleteLike);
+router.post('/report/like', verifyToken, createLike);
+router.delete('/report/like/:id', verifyToken, deleteLike);
 
-router.post('/comment', verifyToken, createComment);
-router.delete('/comment/:id', verifyToken, deleteComment);
+router.post('/report/comment', verifyToken, createComment);
+router.delete('/report/comment/:id', verifyToken, deleteComment);
 
 export default router;

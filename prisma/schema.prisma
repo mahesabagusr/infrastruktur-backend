@@ -83,10 +83,10 @@ model report {
   verifier_id Int?
 
   likes       like[] @relation("ReportLikes")
-  likes_id    Int?
   comments    comment[] @relation("ReportComments")
-  comments_id Int?
   progressUpdates report_progress[]
+
+  likesCount Int @default(0)
 
   @@index([author_id])
   @@index([verifier_id])
@@ -179,6 +179,7 @@ model comment {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  @@unique([user_id, report_id])
   @@index([user_id])
   @@index([report_id])
 }

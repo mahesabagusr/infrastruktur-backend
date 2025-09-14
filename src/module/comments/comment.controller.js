@@ -7,11 +7,11 @@ import {
 import { isValidPayload } from '@/helpers/utils/validator.js';
 import logger from '@/helpers/utils/logger.js';
 import CommentService from '@/module/comments/comment.service.js';
-import { createCommentSchema } from './comment.schema';
+import { commentSchema, deleteCommentSchema } from './comment.schema.js';
 const createComment = async (req, res) => {
     try {
-        let payload = { ...req.body, user_id: req.user.id };
-        const validatePayload = isValidPayload(payload, createCommentSchema);
+        let payload = { ...req.body, username: req.user.username };
+        const validatePayload = isValidPayload(payload, commentSchema);
 
             if (validatePayload.err) {
                 return wrapper.response(
@@ -22,7 +22,7 @@ const createComment = async (req, res) => {
                     httpError.EXPECTATION_FAILED
                 );
             }
-        const result = await CommentService.createComment(validatePayload);
+        const result = await CommentService.createComment(validatePayload.data);
 
         if(result.err){
             return wrapper.response(
@@ -50,8 +50,18 @@ const createComment = async (req, res) => {
 
 const deleteComment = async (req, res) => {
     try {
-        const { id } = req.params;
-        const result = await CommentService.deleteComment(id);
+        let payload = { report_id: parseInt(req.params.id, 10), username: req.user.username };
+        const validatePayload = isValidPayload(payload, deleteCommentSchema);
+            if (validatePayload.err) {
+                return wrapper.response(
+                    res,
+                    "fail",
+                    { err: validatePayload.err, data: null },
+                    "Invalid Payload",
+                    httpError.EXPECTATION_FAILED
+                );
+        }
+        const result = await CommentService.deleteComment(validatePayload.data);
 
         if (result.err) {
             return wrapper.response(

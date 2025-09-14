@@ -94,6 +94,25 @@ const getAllReportModel = joi.object({
     'number.integer': 'User ID harus berupa bilangan bulat.',
     'number.positive': 'User ID harus berupa angka positif.',
   }),
+  like: joi.boolean().optional().messages({
+    "boolean.base": "Field like harus berupa boolean (true/false)",
+  }),
+  weekly: joi.boolean().optional().messages({
+    "boolean.base": "Field weekly harus berupa boolean (true/false)",
+  }),
+  latest: joi.boolean().optional().messages({
+    "boolean.base": "Field latest harus berupa boolean (true/false)",
+  }),
+  provinceId: joi.number().integer().positive().optional().messages({
+    'number.base': 'province ID harus berupa angka.',
+    'number.integer': 'province ID harus berupa bilangan bulat.',
+    'number.positive': 'province ID harus berupa angka positif.',
+  }),
+  regencyId: joi.number().integer().positive().optional().messages({
+    'number.base': 'province ID harus berupa angka.',
+    'number.integer': 'province ID harus berupa bilangan bulat.',
+    'number.positive': 'province ID harus berupa angka positif.',
+  }),
 });
 
 const createReportProgressSchema = joi.object({

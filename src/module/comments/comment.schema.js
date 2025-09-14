@@ -1,11 +1,11 @@
 import joi from 'joi';
 
-export const createCommentSchema = joi.object({
-    user_id: joi.int().required().messages({
-        'number.base': 'User ID harus berupa angka.',
+export const commentSchema = joi.object({
+    username: joi.string().required().messages({
+        'string.base': 'User ID harus berupa string.',
         'any.required': 'User ID wajib diisi.',
     }),
-    report_id: joi.int().required().messages({
+    report_id: joi.number().required().messages({
         'number.base': 'Report ID harus berupa angka.',
         'any.required': 'Report ID wajib diisi.',
     }),
@@ -16,3 +16,14 @@ export const createCommentSchema = joi.object({
         'any.required': 'Konten wajib diisi.',
     }),
 });
+
+export const deleteCommentSchema = joi.object({
+    username: joi.string().required().messages({
+        'string.base': 'User ID harus berupa string.',
+        'any.required': 'User ID wajib diisi.',
+    }),
+    report_id: joi.number().required().messages({
+        'number.base': 'Report ID harus berupa angka.',
+        'any.required': 'Report ID wajib diisi.',
+    }),
+})

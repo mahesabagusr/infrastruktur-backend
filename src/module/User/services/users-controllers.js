@@ -99,6 +99,8 @@ export default class UserService {
         signature: activeToken.user.signature,
         role: activeToken.user.role,
       };
+      console.log(userData);
+      
 
       return wrapper.data(userData);
     } catch (err) {

@@ -1,12 +1,13 @@
 import joi from 'joi';
 
-export const createLikeSchema = joi.object({
-    user_id: joi.int().required().messages({
-        'number.base': 'User ID harus berupa angka.',
+export const likeSchema = joi.object({
+    username: joi.string().required().messages({
+        'string.base': 'User ID harus berupa huruf dan angka',
         'any.required': 'User ID wajib diisi.',
     }),
-    report_id: joi.int().required().messages({
+    report_id: joi.number().required().messages({
         'number.base': 'Report ID harus berupa angka.',
         'any.required': 'Report ID wajib diisi.',
     }),
 });
+

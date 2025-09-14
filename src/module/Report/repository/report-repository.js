@@ -48,8 +48,17 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports({ offset, limit, stage, status, userId }) {
+  static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId }) {
     const where = {};
+    
+    if (provinceId && regencyId) {
+      where.address = {
+        is: {
+          province_id: Number(provinceId),
+          regency_id: Number(regencyId),
+        }
+      };
+    }
 
     if (stage) {
       where.progressUpdates = { some: { stage } };
@@ -61,10 +70,22 @@ export default class ReportRepository {
       where.author_id = parseInt(userId);
     }
 
+    if(weekly){
+      const now = new Date();
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(now.getDate() - 7);
+
+      where.createdAt = { gte: sevenDaysAgo };
+    }
+
     return prisma.report.findMany({
       skip: offset,
       take: limit,
       where,
+      orderBy:[
+        like ? {likesCount: 'desc'} : undefined,
+        latest ? {createdAt: 'desc'} : undefined
+      ].filter(Boolean),
       select: {
         report_id: true,
         title: true,
@@ -81,6 +102,8 @@ export default class ReportRepository {
             regency: { select: { name: true, province_id: true } },
           }
         },
+        likes: true,
+        comments: true,
         _count: { select: { progressUpdates: true } },
         progressUpdates: {
           orderBy: { createdAt: 'desc' },
@@ -104,6 +127,8 @@ export default class ReportRepository {
 
   static async countAllReports({ stage, status, userId }) {
     const where = {};
+
+
 
     if (stage) {
       where.progressUpdates = { some: { stage } }

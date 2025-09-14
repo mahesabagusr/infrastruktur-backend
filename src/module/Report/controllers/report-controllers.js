@@ -180,6 +180,9 @@ const getAllReport = async (req, res) => {
       );
     }
     const query = validatePayload.data;
+    console.log(query);
+    
+    
 
     const result = await ReportService.getAllReport(query);
 

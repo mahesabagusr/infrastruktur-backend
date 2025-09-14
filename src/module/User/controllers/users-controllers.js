@@ -79,7 +79,7 @@ const userLogin = async (req, res) => {
         "fail",
         { err: validatePayload.err },
         "Invalid Payload",
-        httpError.EXPECTATION_FAILED
+        httpError.EXPECTATION_FAILED 
       );
     }
 
@@ -127,6 +127,8 @@ const userLogin = async (req, res) => {
 const refreshToken = async (req, res) => {
   try {
     const currentRefreshToken = req.cookies.refreshToken;
+    console.log(currentRefreshToken);
+    
 
     if (!currentRefreshToken) {
       return wrapper.response(res, "fail", { err: new Unauthorized("Refresh token is required") }, "Unauthorized", httpError.UNAUTHORIZED);

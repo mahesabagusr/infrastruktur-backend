@@ -6,13 +6,15 @@ import {
 
 import { isValidPayload } from '@/helpers/utils/validator.js';
 import logger from '@/helpers/utils/logger.js';
-import LikeService from '@/module/Likes/like.service';
-import { createLikeSchema } from './like.schema';
+import LikeService from '@/module/Likes/like.service.js';
+import { likeSchema } from './like.schema.js';
 
 const createLike = async (req, res)=>{
     try {
-        let payload = {...req.body, user_id: req.user.id};
-        const validatePayload = isValidPayload(payload, createLikeSchema);
+        
+        let payload = {...req.body, username: req.user.username};
+        
+        const validatePayload = isValidPayload(payload, likeSchema);
             if (validatePayload.err) {
                 return wrapper.response(
                     res,
@@ -22,7 +24,9 @@ const createLike = async (req, res)=>{
                     httpError.EXPECTATION_FAILED
                 );
             }
-        const result = await LikeService.createLike(validatePayload);
+        
+        
+        const result = await LikeService.createLike(validatePayload.data);
 
         if(result.err){
             return wrapper.response(
@@ -50,8 +54,20 @@ const createLike = async (req, res)=>{
 
 const deleteLike = async (req, res) => {
     try {
-        const { id } = req.params;
-        const result = await LikeService.deleteLike(id);
+        const payload = {report_id: parseInt(req.params.id, 10), username: req.user.username}
+
+        const validatePayload = isValidPayload(payload, likeSchema);
+            if (validatePayload.err) {
+                return wrapper.response(
+                    res,
+                    "fail",
+                    { err: validatePayload.err, data: null },
+                    "Invalid Payload",
+                    httpError.EXPECTATION_FAILED
+                );
+        }
+
+        const result = await LikeService.deleteLike(payload);
 
         if (result.err) {
             return wrapper.response(
