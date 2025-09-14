@@ -42,7 +42,8 @@ export const verifyRefreshToken = (token) => {
 export const verifyToken = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
-
+    console.log("check token: ", authorization);
+    
     if (!authorization || !authorization.startsWith('Bearer ')) {
       const err = new Unauthorized('Token is required and must be in Bearer format');
       return wrapper.response(res, "fail", { err }, "Unauthorized", httpError.UNAUTHORIZED);
@@ -67,7 +68,7 @@ export const verifyToken = async (req, res, next) => {
         username: decoded.username,
         email: decoded.email,
         signature: decoded.signature,
-        role: decoded.role
+        role: decoded.role,
       };
 
       next();

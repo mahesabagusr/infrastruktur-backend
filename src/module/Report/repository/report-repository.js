@@ -48,8 +48,17 @@ export default class ReportRepository {
     });
   }
   
-  static async findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId }) {
+  static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId }) {
     const where = {};
+    
+    if (provinceId && regencyId) {
+      where.address = {
+        is: {
+          province_id: Number(provinceId),
+          regency_id: Number(regencyId),
+        }
+      };
+    }
 
     if (stage) {
       where.progressUpdates = { some: { stage } };
@@ -61,6 +70,13 @@ export default class ReportRepository {
       where.author_id = parseInt(userId);
     }
 
+    if(weekly){
+      const now = new Date();
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(now.getDate() - 7);
+
+      where.createdAt = { gte: sevenDaysAgo };
+    }
     if (provinceId || regencyId) {
       where.address = {};
       if (provinceId) where.address.province_id = parseInt(provinceId);
@@ -71,6 +87,10 @@ export default class ReportRepository {
       skip: offset,
       take: limit,
       where,
+      orderBy:[
+        like ? {likesCount: 'desc'} : undefined,
+        latest ? {createdAt: 'desc'} : undefined
+      ].filter(Boolean),
       select: {
         report_id: true,
         title: true,
@@ -87,6 +107,8 @@ export default class ReportRepository {
             regency: { select: { name: true, regency_id: true } },
           }
         },
+        likes: true,
+        comments: true,
         _count: { select: { progressUpdates: true } },
         progressUpdates: {
           orderBy: { createdAt: 'desc' },
@@ -110,6 +132,8 @@ export default class ReportRepository {
 
   static async countAllReports({ stage, status, userId, provinceId, regencyId }) {
     const where = {};
+
+
 
     if (stage) {
       where.progressUpdates = { some: { stage } }
