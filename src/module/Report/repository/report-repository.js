@@ -48,7 +48,7 @@ export default class ReportRepository {
     });
   }
   
-  static async findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId }) {
+  static async findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId, reportId }) {
     const where = {};
 
     if (stage) {
@@ -59,6 +59,9 @@ export default class ReportRepository {
     }
     if (userId) {
       where.author_id = parseInt(userId);
+    }
+    if (reportId) {
+      where.report_id = parseInt(reportId);
     }
 
     if (provinceId || regencyId) {
