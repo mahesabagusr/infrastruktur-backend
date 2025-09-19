@@ -27,9 +27,8 @@ router.post('/report', verifyToken, acceptImageFields, normalizeSingleFile, addR
 router.post('/report/:reportId/progress', verifyToken, basicAuth, acceptImageFields, normalizeSingleFile, addReportProgress);
 router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
 router.get('/report', getAllReport);
-router.get('/report/:reportId', getReportById)
 router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProgressById);
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
-router.get('/report/:reportId', verifyToken, getReportById);
+router.get('/report/:reportId', getReportById);
 
 export default router;
