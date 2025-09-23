@@ -99,11 +99,11 @@ const userLogin = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      secure: true,
+      sameSite: 'None',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log(result);
+
     return wrapper.response(
       res,
       "success",
@@ -137,7 +137,6 @@ const refreshToken = async (req, res) => {
     const result = await UserService.refreshToken(currentRefreshToken);
 
     if (result.err) {
-      console.log(result.err)
       return wrapper.response(
         res,
         "fail",
@@ -151,7 +150,8 @@ const refreshToken = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
+      sameSite: 'None',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -165,7 +165,6 @@ const refreshToken = async (req, res) => {
 
   } catch (err) {
     logger.error(`Unexpected error during refresh token: ${err.message}`);
-    console.log(err.message)
     return wrapper.response(
       res,
       "fail",

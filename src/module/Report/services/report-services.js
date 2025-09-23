@@ -18,7 +18,6 @@ export default class ReportService {
         return wrapper.error(new BadRequestError("Foto laporan wajib diunggah."));
       }
 
-      // Use the single uploader utility
       const uploadResult = await uploadToCloudinary(image, { folder: "reports" });
       if (!uploadResult || !uploadResult.secure_url) {
         return wrapper.error(new BadRequestError("Image upload failed"));
