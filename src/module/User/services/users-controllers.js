@@ -62,6 +62,7 @@ export default class UserService {
         email: user.email,
         signature: user.signature,
         role: user.role,
+        id: user.user_id
       }
 
       return wrapper.data(userData);
@@ -99,6 +100,8 @@ export default class UserService {
         signature: activeToken.user.signature,
         role: activeToken.user.role,
       };
+      console.log(userData);
+      
 
       return wrapper.data(userData);
     } catch (err) {

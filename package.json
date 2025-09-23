@@ -30,7 +30,6 @@
     "nanoid": "^5.0.7",
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
-    "prisma": "^6.12.0",
     "sequelize": "^6.37.3",
     "store": "^2.0.12",
     "streamifier": "^0.1.1",
@@ -47,7 +46,8 @@
     "babel-plugin-module-resolver": "^5.0.2",
     "eslint": "^9.9.1",
     "eslint-config-dicodingacademy": "^0.9.4",
-    "globals": "^15.9.0"
+    "globals": "^15.9.0",
+    "prisma": "^6.15.0"
   },
   "prisma": {
     "seed": "node --no-warnings --loader=./custom-loader.mjs prisma/seed.js"

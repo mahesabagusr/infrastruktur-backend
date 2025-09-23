@@ -47,9 +47,20 @@ export default class ReportRepository {
       }
     });
   }
-  
-  static async findAllReports({ offset, limit, stage, status, userId, provinceId, regencyId, reportId }) {
+
+ static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
     const where = {};
+    const now = new Date();
+    const startOfToday = new Date(now);
+
+    if (provinceId && regencyId) {
+      where.address = {
+        is: {
+          province_id: Number(provinceId) || 0,
+          regency_id: Number(regencyId) || 0,
+        }
+      };
+    }
 
     if (stage) {
       where.progressUpdates = { some: { stage } };
@@ -60,10 +71,20 @@ export default class ReportRepository {
     if (userId) {
       where.author_id = parseInt(userId);
     }
-    if (reportId) {
-      where.report_id = parseInt(reportId);
+    if(today){
+      startOfToday.setHours(0,0,0,0)
+      where.createdAt = {
+        gte: startOfToday,
+        lte: now,
+      }
     }
 
+    if(weekly){
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(now.getDate() - 7);
+
+      where.createdAt = { gte: sevenDaysAgo };
+    }
     if (provinceId || regencyId) {
       where.address = {};
       if (provinceId) where.address.province_id = parseInt(provinceId);
@@ -74,6 +95,10 @@ export default class ReportRepository {
       skip: offset,
       take: limit,
       where,
+      orderBy:[
+        like ? {likesCount: 'desc'} : undefined,
+        latest ? {createdAt: 'desc'} : undefined
+      ].filter(Boolean),
       select: {
         report_id: true,
         title: true,
@@ -82,6 +107,7 @@ export default class ReportRepository {
         verification_notes: true,
         photoUrl: true,
         createdAt: true,
+        updatedAt: true,
         author: { select: { username: true } },
         address: {
           select: {
@@ -90,6 +116,8 @@ export default class ReportRepository {
             regency: { select: { name: true, regency_id: true } },
           }
         },
+        likes: true,
+        comments: true,
         _count: { select: { progressUpdates: true } },
         progressUpdates: {
           orderBy: { createdAt: 'desc' },
@@ -113,6 +141,8 @@ export default class ReportRepository {
 
   static async countAllReports({ stage, status, userId, provinceId, regencyId }) {
     const where = {};
+
+
 
     if (stage) {
       where.progressUpdates = { some: { stage } }
