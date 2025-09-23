@@ -49,6 +49,8 @@ export default class ReportService {
         verification_status,
         verification_notes,
       });
+      console.log(updatedReport);
+      
 
       if (!updatedReport) {
         return wrapper.error(new BadRequestError("Failed to update report"));
@@ -93,10 +95,10 @@ export default class ReportService {
 
   static getAllReport = async (query) => {
     try {
-      const { page = 1, limit = 10, stage, status, userId, weekly, like, latest, provinceId, regencyId } = query;
+      const { page = 1, limit = 10, stage, status, userId, weekly, like, latest, provinceId, regencyId, today } = query;
       
       const offset = (page - 1) * limit;
-      const reports = await ReportRepository.findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId });
+      const reports = await ReportRepository.findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today });
       const total = await ReportRepository.countAllReports({ stage, status, userId });
 
       if (!reports || reports.length === 0) {

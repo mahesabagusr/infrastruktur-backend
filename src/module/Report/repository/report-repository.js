@@ -48,14 +48,16 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId }) {
+  static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
     const where = {};
-    
+    const now = new Date();
+    const startOfToday = new Date(now);
+
     if (provinceId && regencyId) {
       where.address = {
         is: {
-          province_id: Number(provinceId),
-          regency_id: Number(regencyId),
+          province_id: Number(provinceId) || 0,
+          regency_id: Number(regencyId) || 0,
         }
       };
     }
@@ -69,9 +71,15 @@ export default class ReportRepository {
     if (userId) {
       where.author_id = parseInt(userId);
     }
+    if(today){
+      startOfToday.setHours(0,0,0,0)
+      where.createdAt = {
+        gte: startOfToday,
+        lte: now,
+      }
+    }
 
     if(weekly){
-      const now = new Date();
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(now.getDate() - 7);
 
@@ -94,6 +102,7 @@ export default class ReportRepository {
         verification_notes: true,
         photoUrl: true,
         createdAt: true,
+        updatedAt: true,
         author: { select: { username: true } },
         address: {
           select: {

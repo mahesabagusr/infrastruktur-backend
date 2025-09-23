@@ -103,6 +103,9 @@ const getAllReportModel = joi.object({
   latest: joi.boolean().optional().messages({
     "boolean.base": "Field latest harus berupa boolean (true/false)",
   }),
+  today: joi.boolean().optional().messages({
+    "boolean.base": "Field today harus berupa boolean (true/false)",
+  }),
   provinceId: joi.number().integer().positive().optional().messages({
     'number.base': 'province ID harus berupa angka.',
     'number.integer': 'province ID harus berupa bilangan bulat.',
@@ -121,7 +124,6 @@ const createReportProgressSchema = joi.object({
     'string.min': 'Progress Notes minimal harus 10 karakter',
     'any.required': 'Progress Notes wajib diisi',
   }),
-
   stage: joi.string().valid(...progressStageEnum).optional().default('REVIEW').messages({
     'string.base': 'Stage harus berupa teks',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,

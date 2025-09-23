@@ -62,6 +62,7 @@ export default class UserService {
         email: user.email,
         signature: user.signature,
         role: user.role,
+        id: user.user_id
       }
 
       return wrapper.data(userData);
