@@ -48,7 +48,7 @@ export default class ReportRepository {
     });
   }
 
-  static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
+ static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
     const where = {};
     const now = new Date();
     const startOfToday = new Date(now);
