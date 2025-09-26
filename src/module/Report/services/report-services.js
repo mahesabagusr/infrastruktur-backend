@@ -104,7 +104,6 @@ export default class ReportService {
         return wrapper.error(new NotFoundError("Laporan tidak ditemukan"));
       }
       
-
       const totalPages = Math.ceil(total / limit);
       const meta = { page: Number(page), limit: Number(limit), total, totalPages };
       return wrapper.paginationData(reports, meta);
