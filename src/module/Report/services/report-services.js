@@ -82,6 +82,10 @@ export default class ReportService {
         reportId,
         photo_url: imageUrl,
       });
+      
+      if(newReportProgress.stage === "COMPLETED"){
+        await UserRepository.incrementUserPoints(author.user_id, 5);
+      }
 
       if (!newReportProgress) {
         return wrapper.error(new BadRequestError("Failed to create report progress"));

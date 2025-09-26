@@ -120,7 +120,6 @@ const addReportProgress = async (req, res) => {
     }
     console.log(req.body);
 
-
     const validatePayload = isValidPayload(req.body, createReportProgressSchema);
 
     if (validatePayload.err) {
@@ -182,7 +181,8 @@ const getAllReport = async (req, res) => {
       );
     }
     const query = validatePayload.data;
-    console.log("test: ", query);
+
+    console.log("test: ",query);
 
     const result = await ReportService.getAllReport(query);
 

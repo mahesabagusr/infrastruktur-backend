@@ -1,11 +1,13 @@
 import express from 'express';
-import { userRegister, userLogin, refreshToken, userLogout, getUserById, getUser } from '@/module/User/controllers/users-controllers.js';
+import { userRegister, userLogin, refreshToken, userLogout, getUserById, getUser, getLeaderBoard } from '@/module/User/controllers/users-controllers.js';
 import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/module/Provinces/controllers/provinces-controllers.js';
 import { addReport, addReportProgress, getAllReport, verifyReport, getReportProgressById, getReportById } from '@/module/Report/controllers/report-controllers.js';
 import { verifyToken } from '@/middlewares/jwt-auth.js';
 import { basicAuth } from '@/middlewares/basic-auth.js';
 import { acceptImageFields, normalizeSingleFile } from '@/helpers/utils/multer.js';
+
 import { createLike, deleteLike, getLikesCount } from '@/module/Likes/like.controller.js';
+
 import { createComment, deleteComment } from '@/module/comments/comment.controller.js';
 
 const router = express.Router();
@@ -18,6 +20,7 @@ router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
 router.post('/user/refreshToken', refreshToken)
 router.post('/user/logout', verifyToken, userLogout)
+router.get('/user/leaderboard', verifyToken, getLeaderBoard)
 router.get('/user/:userId', verifyToken, getUserById)
 router.get('/user', verifyToken, getUser)
 
@@ -35,6 +38,7 @@ router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProg
 router.post('/report/like', verifyToken, createLike);
 router.delete('/report/like/:id', verifyToken, deleteLike);
 router.get('/report/:reportId/like', verifyToken, getLikesCount);
+
 
 router.post('/report/comment', verifyToken, createComment);
 router.delete('/report/comment/:id', verifyToken, deleteComment);

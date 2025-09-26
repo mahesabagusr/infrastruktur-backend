@@ -131,4 +131,3 @@ export default class LikeService {
       return wrapper.error(new BadRequestError(err.message));
     }
   }
-}

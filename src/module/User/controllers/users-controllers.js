@@ -240,6 +240,40 @@ const getUser = async (req, res) => {
   }
 }
 
+const getLeaderBoard = async (req, res) => {
+  try {
+    const result = await UserService.getUserleaderboard();
+
+    if (result.err) {
+      return wrapper.response(
+        res,
+        "fail",
+        result,
+        "Gagal mendapatkan leaderboard",
+        httpError.NOT_FOUND
+      );
+    }
+
+    return wrapper.response(
+      res,
+      "success",
+      result,
+      "Berhasil mendapatkan leaderboard",
+      http.OK
+    );
+
+  } catch (err) {
+    logger.error(`Unexpected error during getLeaderBoard: ${err.message}`);
+    return wrapper.response(
+      res,
+      "fail",
+      { err: err.message, data: null },
+      "An unexpected error occurred",
+      httpError.INTERNAL_ERROR
+    );
+  }
+}
+
 const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -275,4 +309,4 @@ const getUserById = async (req, res) => {
   }
 }
 
-export { userRegister, userLogin, refreshToken, userLogout, getUserById, getUser };
+export { userRegister, userLogin, refreshToken, userLogout, getUserById, getUser, getLeaderBoard };

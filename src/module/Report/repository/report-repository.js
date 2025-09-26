@@ -49,6 +49,7 @@ export default class ReportRepository {
   }
 
   static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
+
     const where = {};
     const now = new Date();
     const startOfToday = new Date(now);
@@ -73,13 +74,16 @@ export default class ReportRepository {
     }
     if (today) {
       startOfToday.setHours(0, 0, 0, 0)
+
       where.createdAt = {
         gte: startOfToday,
         lte: now,
       }
     }
 
+
     if (weekly) {
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(now.getDate() - 7);
 
