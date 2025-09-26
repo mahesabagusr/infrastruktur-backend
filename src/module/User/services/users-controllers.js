@@ -127,6 +127,15 @@ export default class UserService {
     }
   }
 
+  static async getUserleaderboard(){
+    try {
+      const users = await UserRepository.leaderBoardUsers();
+      return wrapper.data(users);
+    } catch (err) {
+      return wrapper.error(new BadRequestError(err.message));
+    }
+  }
+
   static async getUserById(userId) {
     try {
       const user = await UserRepository.findUserById(userId);

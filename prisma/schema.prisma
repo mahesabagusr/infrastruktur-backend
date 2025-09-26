@@ -36,6 +36,7 @@ model user {
   lastname     String?
   username     String   @unique
   phone_number String
+  points        Int      @default(0)
   role         Role     @default(USER)
   signature    String?
   createdAt    DateTime @default(now())

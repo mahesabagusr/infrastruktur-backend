@@ -12,6 +12,33 @@ export default class UserRepository {
     });
   }
 
+  static async incrementUserPoints(userId, points) {
+    return prisma.user.update({
+      where: { user_id: userId },
+      data: {
+        points: {
+          increment: points,
+        },
+      },
+    });
+  }
+
+  static async leaderBoardUsers() {
+    return prisma.user.findMany({
+      where: {
+        role: 'USER'
+      },
+      orderBy: { points: 'desc' },
+      // take: limit,
+      select: {
+        user_id: true,
+        username: true,
+        points: true,
+        // _count: { select: { reports: true } }
+      }
+    });
+  }
+
   static async createUser(userData) {
     const { username, firstName, lastName, email, hashPassword, signature, phoneNumber, street, provinceId, regencyId } = userData;
 
