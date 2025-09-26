@@ -118,6 +118,8 @@ const addReportProgress = async (req, res) => {
         httpError.BAD_REQUEST
       );
     }
+    console.log(req.body);
+    
 
     const validatePayload = isValidPayload(req.body, createReportProgressSchema);
 
@@ -180,6 +182,9 @@ const getAllReport = async (req, res) => {
       );
     }
     const query = validatePayload.data;
+    console.log("test: ",query);
+    
+    
 
     const result = await ReportService.getAllReport(query);
 

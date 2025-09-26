@@ -94,15 +94,27 @@ const getAllReportModel = joi.object({
     'number.integer': 'User ID harus berupa bilangan bulat.',
     'number.positive': 'User ID harus berupa angka positif.',
   }),
+  like: joi.boolean().optional().messages({
+    "boolean.base": "Field like harus berupa boolean (true/false)",
+  }),
+  weekly: joi.boolean().optional().messages({
+    "boolean.base": "Field weekly harus berupa boolean (true/false)",
+  }),
+  latest: joi.boolean().optional().messages({
+    "boolean.base": "Field latest harus berupa boolean (true/false)",
+  }),
+  today: joi.boolean().optional().messages({
+    "boolean.base": "Field today harus berupa boolean (true/false)",
+  }),
   provinceId: joi.number().integer().positive().optional().messages({
-    'number.base': 'Provinsi ID harus berupa angka.',
-    'number.integer': 'Provinsi ID harus berupa bilangan bulat.',
-    'number.positive': 'Provinsi ID harus berupa angka positif.',
+    'number.base': 'province ID harus berupa angka.',
+    'number.integer': 'province ID harus berupa bilangan bulat.',
+    'number.positive': 'province ID harus berupa angka positif.',
   }),
   regencyId: joi.number().integer().positive().optional().messages({
-    'number.base': 'Kabupaten/Kota ID harus berupa angka.',
-    'number.integer': 'Kabupaten/Kota ID harus berupa bilangan bulat.',
-    'number.positive': 'Kabupaten/Kota ID harus berupa angka positif.',
+    'number.base': 'province ID harus berupa angka.',
+    'number.integer': 'province ID harus berupa bilangan bulat.',
+    'number.positive': 'province ID harus berupa angka positif.',
   }),
 });
 
@@ -112,7 +124,6 @@ const createReportProgressSchema = joi.object({
     'string.min': 'Progress Notes minimal harus 10 karakter',
     'any.required': 'Progress Notes wajib diisi',
   }),
-
   stage: joi.string().valid(...progressStageEnum).optional().default('REVIEW').messages({
     'string.base': 'Stage harus berupa teks',
     'any.only': `Stage harus salah satu dari: ${progressStageEnum.join(', ')}`,

@@ -5,6 +5,8 @@ import { addReport, addReportProgress, getAllReport, getAllReportsByProvince, ve
 import { verifyToken } from '@/middlewares/jwt-auth.js';
 import { basicAuth } from '@/middlewares/basic-auth.js';
 import { acceptImageFields, normalizeSingleFile } from '@/helpers/utils/multer.js';
+import { createLike, deleteLike } from '@/module/Likes/like.controller.js';
+import { createComment, deleteComment } from '@/module/comments/comment.controller.js';
 
 const router = express.Router();
 
@@ -29,6 +31,15 @@ router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
 router.get('/report', getAllReport);
 router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProgressById);
 router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
+
+
+router.post('/report/like', verifyToken, createLike);
+router.delete('/report/like/:id', verifyToken, deleteLike);
+
+router.post('/report/comment', verifyToken, createComment);
+router.delete('/report/comment/:id', verifyToken, deleteComment);
+
 router.get('/report/:reportId', getReportById);
+
 
 export default router;
