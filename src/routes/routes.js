@@ -1,11 +1,13 @@
 import express from 'express';
 import { userRegister, userLogin, refreshToken, userLogout, getUserById, getUser, getLeaderBoard } from '@/module/User/controllers/users-controllers.js';
 import { getAllProvinces, getAllRegencies, getRegenciesByProvincesId } from '@/module/Provinces/controllers/provinces-controllers.js';
-import { addReport, addReportProgress, getAllReport, getAllReportsByProvince, verifyReport, getReportProgressById, getReportById } from '@/module/Report/controllers/report-controllers.js';
+import { addReport, addReportProgress, getAllReport, verifyReport, getReportProgressById, getReportById } from '@/module/Report/controllers/report-controllers.js';
 import { verifyToken } from '@/middlewares/jwt-auth.js';
 import { basicAuth } from '@/middlewares/basic-auth.js';
 import { acceptImageFields, normalizeSingleFile } from '@/helpers/utils/multer.js';
-import { createLike, deleteLike } from '@/module/Likes/like.controller.js';
+
+import { createLike, deleteLike, getLikesCount } from '@/module/Likes/like.controller.js';
+
 import { createComment, deleteComment } from '@/module/comments/comment.controller.js';
 
 const router = express.Router();
@@ -30,16 +32,18 @@ router.post('/report', verifyToken, acceptImageFields, normalizeSingleFile, addR
 router.post('/report/:reportId/progress', verifyToken, basicAuth, acceptImageFields, normalizeSingleFile, addReportProgress);
 router.patch('/report/:reportId/verify', verifyToken, basicAuth, verifyReport);
 router.get('/report', getAllReport);
-router.get('/report/:reportId', getReportById)
 router.get('/report/:progressId/progress', verifyToken, basicAuth, getReportProgressById);
-router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
+// router.get('/report/:provinceId', verifyToken, getAllReportsByProvince);
 
 router.post('/report/like', verifyToken, createLike);
 router.delete('/report/like/:id', verifyToken, deleteLike);
+router.get('/report/:reportId/like', verifyToken, getLikesCount);
+
 
 router.post('/report/comment', verifyToken, createComment);
 router.delete('/report/comment/:id', verifyToken, deleteComment);
 
-router.get('/report/:reportId', verifyToken, getReportById);
+router.get('/report/:reportId', getReportById);
+
 
 export default router;

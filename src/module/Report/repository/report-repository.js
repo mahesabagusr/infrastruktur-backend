@@ -48,7 +48,8 @@ export default class ReportRepository {
     });
   }
 
- static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
+  static async findAllReports({ offset, limit, stage, status, userId, weekly, like, latest, provinceId, regencyId, today }) {
+
     const where = {};
     const now = new Date();
     const startOfToday = new Date(now);
@@ -71,15 +72,18 @@ export default class ReportRepository {
     if (userId) {
       where.author_id = parseInt(userId);
     }
-    if(today){
-      startOfToday.setHours(0,0,0,0)
+    if (today) {
+      startOfToday.setHours(0, 0, 0, 0)
+
       where.createdAt = {
         gte: startOfToday,
         lte: now,
       }
     }
 
-    if(weekly){
+
+    if (weekly) {
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(now.getDate() - 7);
 
@@ -95,9 +99,9 @@ export default class ReportRepository {
       skip: offset,
       take: limit,
       where,
-      orderBy:[
-        like ? {likesCount: 'desc'} : undefined,
-        latest ? {createdAt: 'desc'} : undefined
+      orderBy: [
+        like ? { likesCount: 'desc' } : undefined,
+        latest ? { createdAt: 'desc' } : undefined
       ].filter(Boolean),
       select: {
         report_id: true,
@@ -188,6 +192,7 @@ export default class ReportRepository {
   }
 
   static async findReportById(reportId) {
+
     return prisma.report.findUnique({
       where: {
         report_id: parseInt(reportId),

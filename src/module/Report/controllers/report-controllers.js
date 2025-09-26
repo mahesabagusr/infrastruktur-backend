@@ -119,7 +119,6 @@ const addReportProgress = async (req, res) => {
       );
     }
     console.log(req.body);
-    
 
     const validatePayload = isValidPayload(req.body, createReportProgressSchema);
 
@@ -182,9 +181,8 @@ const getAllReport = async (req, res) => {
       );
     }
     const query = validatePayload.data;
+
     console.log("test: ",query);
-    
-    
 
     const result = await ReportService.getAllReport(query);
 
@@ -256,9 +254,10 @@ const getAllReportsByProvince = async (req, res) => {
 
 const getReportById = async (req, res) => {
   try {
+    console.log(req.params)
     const { reportId } = req.params;
     const result = await ReportService.getReportById(reportId);
-
+    console.log(reportId)
     if (result.err) {
       return wrapper.response(
         res,

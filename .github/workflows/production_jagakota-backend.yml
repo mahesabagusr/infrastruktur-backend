@@ -72,7 +72,7 @@ jobs:
           npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
+ 
       - name: Run Prisma Seed
         run: |
           npx prisma db seed
